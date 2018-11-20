@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">RedHost</string>
+    <string name="loginTitle">Ingrese sus datos</string>
+    <string name="loginButton">Ingresar</string>
+    <string name="loginRegistrer">Registrarse</string>
+    <string name="loginForgot">¿Olvidó su contraseña?</string>
+    <string name="loginUser">Nombre</string>
+    <string name="loginPassword">Password</string>
+    <string name="loginSwitch">Mantener conectado? </string>
+    <string name="forgotEmail">Ingrese su correo</string>
+    <string name="forgotBut">Enviar</string>
+    <string name="forgotText">Olvidó su contreña? \n Ingrese su correo electrónico de registro y le enviaremos un link para que pueda resetear la contraseña.</string>
+    <string name="termstext">Términos y Condiciones \n Red Off es una aplicación que relaciona a negocios con usuarios. Los usuarios finales. Red Off es una aplicación que relaciona a negocios con usuarios. Los usuarios finales. Red Off es una aplicación que relaciona a negocios con usuarios. Los usuarios finales. Red Off es una aplicación que relaciona a negocios con usuarios. Los usuarios finales. Red Off es una aplicación que relaciona a negocios con usuarios. Los usuarios finales. Red Off es una aplicación que relaciona a negocios con usuarios. Los usuarios finales. Red Off es una aplicación que relaciona a negocios con usuarios. Los usuarios finales. Red Off es una aplicación que relaciona a negocios con usuarios. Los usuarios finales. Red Off es una aplicación que relaciona a negocios con usuarios. Los usuarios finales. Red Off es una aplicación que relaciona a negocios con usuarios. Los usuarios finales. Red Off es una aplicación que relaciona a negocios con usuarios. Los usuarios finales. Red Off es una aplicación que relaciona a negocios con usuarios. Los usuarios finales. Red Off es una aplicación que relaciona a negocios con usuarios. Los usuarios finales. Red Off es una aplicación que relaciona a negocios con usuarios. Los usuarios finales. Red Off es una aplicación que relaciona a negocios con usuarios. Los usuarios finales. Red Off es una aplicación que relaciona a negocios con usuarios. Los usuarios finales. Red Off es una aplicación que relaciona a negocios con usuarios. Los usuarios finales. .</string>
+</resources>
