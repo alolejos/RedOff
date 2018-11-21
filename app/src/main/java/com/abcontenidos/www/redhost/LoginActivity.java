@@ -23,6 +23,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -71,14 +73,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 String emailPattern = "^[_a-z0-9-]+(\\.[_a-z0-9-]+)*@" +
                         "[a-z0-9-]+(\\.[a-z0-9-]+)*(\\.[a-z]{2,4})$";
                 Pattern pattern = Pattern.compile(emailPattern);
-                if (user == "") {
-                    showToastMessage("El campo está vacío, ingrese una dirección de correo");
+                if (user.trim().length()==0 || password.trim().length()==0) {
+                    showToastMessage("Alguno de los campos están vacíos. Ingrese correo y contraseña");
                     nameText.getText().clear();
+                    passwordText.getText().clear();
                 }else {
                     Matcher matcher = pattern.matcher(user);
                     if (matcher.matches()) {
                         RequestQueue queue = Volley.newRequestQueue(this);
-                        String url ="https://qareful.com/testurl?id="+user+"&pass="+password;
+                        String url ="http://redoff.bithive.cloud/ws/login";
                         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                                 new Response.Listener<String>() {
                                     @Override
@@ -87,14 +90,19 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                         {
                                             showToastMessage("El mail ingresado no está en nuestros registros, ingrese un email válido.");
                                             nameText.getText().clear();
+                                            passwordText.getText().clear();
                                         }else {
+
+
+                                            // TOMAR LA RESPUESTA... PARSEARLA Y GUARDAR EL NOMBRE EL USUARIO
+                                            // EN EL SHARED PREFERENCES... Y EL TOKEN Y GUARDAR LA FLAG
+
                                             SharedPreferences.Editor ed = sp.edit();
                                             ed.putString("user", nameText.getText().toString());
-                                            ed.putString("key", response);
-                                            ed.putBoolean("state", aSwitch.isChecked());
+                                            ed.putString("token", response);
+                                            ed.putBoolean("flag", aSwitch.isChecked());
                                             ed.apply();
-                                            // hay que tomar los datos que devuelve... poner el name en el sharedpreferenc y guardar tambien ahi el token.
-                                            // si el switch de permanencia esta en ON... guardar todo y pasar al mainactivity
+
                                             Intent i = new Intent(LoginActivity.this, MainActivity.class);
                                             i.putExtra("key", response);
                                             startActivity(i);
@@ -105,7 +113,17 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             public void onErrorResponse(VolleyError error) {
                                 showToastMessage("That didn't work! -- "+error.toString());
                             }
-                        });
+                        }) {
+                            @Override
+                            protected Map<String, String> getParams() {
+                                // Posting parameters to login url
+                                Map<String, String> params = new HashMap<>();
+                                params.put("user", nameText.getText().toString());
+                                params.put("pass", passwordText.getText().toString());
+                                return params;
+                            }
+
+                        };
                         // Add the request to the RequestQueue.
                         queue.add(stringRequest);
                     }else{
@@ -113,9 +131,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         nameText.getText().clear();
                     }
                 }
-                intent = new Intent(this, MainActivity.class);
-                intent.putExtra("key", "12345678");
-                startActivity(intent);
+
                 break;
             case R.id.registerText:
                 intent = new Intent(this, RegisterActivity.class);
