@@ -3,9 +3,11 @@ package com.abcontenidos.www.redhost;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -24,6 +26,8 @@ public class CategoryActivity extends AppCompatActivity implements MyRecyclerVie
     MyRecyclerViewAdapterCategories adapter;
     Button categorySave;
     Intent i;
+    SharedPreferences sp;
+    BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +36,7 @@ public class CategoryActivity extends AppCompatActivity implements MyRecyclerVie
 
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar1);
         setSupportActionBar(myToolbar);
+        bottomNavigationView = (BottomNavigationView) findViewById(R.id.my_toolbar_botom);
 
         MyDbHelper helper = new MyDbHelper(this, "categories");
         SQLiteDatabase db = helper.getWritableDatabase();
@@ -43,10 +48,12 @@ public class CategoryActivity extends AppCompatActivity implements MyRecyclerVie
         RecyclerView recyclerView = findViewById(R.id.recycler_category);
 
         int numberOfColumns = 2;
-        recyclerView.setLayoutManager(new GridLayoutManager(this, numberOfColumns));
+        recyclerView.setLayoutManager(new LinearLayoutManager(this  ));
         adapter = new MyRecyclerViewAdapterCategories(this, categoryDao.getall());
         adapter.setClickListener(this);
         recyclerView.setAdapter(adapter);
+
+        sp = getSharedPreferences("Login", MODE_PRIVATE);
     }
 
     @Override
@@ -64,8 +71,19 @@ public class CategoryActivity extends AppCompatActivity implements MyRecyclerVie
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_other, menu);
+        getMenuInflater().inflate(R.menu.menu_main, menu);
 
+        // Inflate and initialize the bottom menu
+        Menu bottomMenu = bottomNavigationView.getMenu();
+        Log.d("tamaño", "= "+bottomMenu.size());
+        for (int i = 0; i < bottomMenu.size(); i++) {
+            bottomMenu.getItem(i).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    return onOptionsItemSelected(item);
+                }
+            });
+        }
         return true;
     }
 
@@ -79,7 +97,22 @@ public class CategoryActivity extends AppCompatActivity implements MyRecyclerVie
             case R.id.action_acerca:
                 showToastMessage("Red Off es una aplicacion bla bla bla bla \n Desarrollado por Abcontenidos.com");
                 break;
-
+            case R.id.action_logout:
+                SharedPreferences.Editor ed = sp.edit();
+                ed.clear();
+                ed.apply();
+                i = new Intent(this, LoginActivity.class);
+                startActivity(i);
+                break;
+            case R.id.action_botom_main:
+                finish();
+                break;
+            case R.id.action_botom_favorites:
+                break;
+            case R.id.action_botom_profile:
+                i = new Intent(this, ProfileActivity.class);
+                startActivity(i);
+                break;
             default:
                 break;
         }

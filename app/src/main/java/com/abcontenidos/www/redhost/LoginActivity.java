@@ -82,7 +82,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     if (matcher.matches()) {
                         RequestQueue queue = Volley.newRequestQueue(this);
                         String url ="http://redoff.bithive.cloud/ws/login";
-                        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                                 new Response.Listener<String>() {
                                     @Override
                                     public void onResponse(String response) {

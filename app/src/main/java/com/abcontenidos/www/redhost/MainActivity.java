@@ -103,13 +103,20 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
             case R.id.action_logout:
                 SharedPreferences.Editor ed = sp.edit();
                 ed.clear();
-                finish();
+                ed.apply();
+                i = new Intent(this, LoginActivity.class);
+                startActivity(i);
+                break;
+            case R.id.action_botom_main:
                 break;
             case R.id.action_botom_favorites:
                 i = new Intent(this, CategoryActivity.class);
                 startActivity(i);
                 break;
-
+            case R.id.action_botom_profile:
+                i = new Intent(this, ProfileActivity.class);
+                startActivity(i);
+                break;
             default:
                 break;
         }

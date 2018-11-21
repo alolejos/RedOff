@@ -1,13 +1,5 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-
-    <item
-        android:id="@+id/miProfile"
-        android:icon="@android:drawable/ic_search_category_default"
-        app:showAsAction="ifRoom|withText"
-        android:title="Search"
-        app:actionViewClass="android.widget.SearchView">
-    </item>
     <item
         android:id="@+id/action_terminos"
         android:icon="@android:drawable/btn_star"
@@ -18,12 +10,6 @@
         android:id="@+id/action_acerca"
         android:icon="@android:drawable/btn_star"
         android:title="Acerca de">
-
-    </item>
-    <item
-        android:id="@+id/action_logout"
-        android:icon="@android:drawable/btn_star"
-        android:title="Logout">
 
     </item>
 </menu>

@@ -1,10 +1,8 @@
 package com.abcontenidos.www.redhost;
 
 import android.content.Context;
-import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,11 +40,12 @@ public class MyRecyclerViewAdapterCategories extends RecyclerView.Adapter<MyRecy
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         //holder.imageCategory.setImageURI(Uri.parse(mData.get(position).getImage()));
-        holder.switchSelected.setText(mData.get(position).getName());
+        holder.textName.setText(mData.get(position).getName());
         holder.textDetails.setText(mData.get(position).getDetails());
         holder.switchSelected.setChecked(Boolean.parseBoolean(mData.get(position).getSelected()));
         //Picasso.with(context).load(android_versions.get(i).getAndroid_image_url()).resize(120, 60).into(viewHolder.img_android);
-        Picasso.get().load(mData.get(position).getImage()).resize(120, 120).into(holder.imageCategory);
+        Picasso.get().load(mData.get(position).getImage()).resize(180, 120).into(holder.imageCategory);
+
     }
 
 
@@ -65,6 +64,7 @@ public class MyRecyclerViewAdapterCategories extends RecyclerView.Adapter<MyRecy
 
         ViewHolder(View itemView) {
             super(itemView);
+            textName = itemView.findViewById(R.id.textName1);
             textDetails = itemView.findViewById(R.id.textCategoryDetails);
             imageCategory = itemView.findViewById(R.id.imageCategory);
             switchSelected = itemView.findViewById(R.id.switchCategory);
