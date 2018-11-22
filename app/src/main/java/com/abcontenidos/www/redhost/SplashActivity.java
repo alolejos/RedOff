@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -19,83 +20,93 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class SplashActivity extends AppCompatActivity {
 
     SharedPreferences sp1;
-    String key, name;
+    String name;
+    Integer id;
     RequestQueue queue;
+    Boolean flag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+
         sp1 = this.getSharedPreferences("Login", MODE_PRIVATE);
-        Boolean state = sp1.getBoolean("state", false);
+        flag = sp1.getBoolean("flag", false);
         name = sp1.getString("user", null);
-        key = sp1.getString("key", null);
+        id = sp1.getInt("id", 0);
+
         queue = Volley.newRequestQueue(this);
+
+        String url ="http://redoff.bithive.cloud/ws/categories";
+
+        StringRequest strReq = new StringRequest(
+                Request.Method.POST,
+                url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("respuesta1", response);
+                        if(response!="none"){
+                            try {
+                                saveCategories(response);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                }) {
+                @Override
+                protected Map<String, String> getParams() {
+                    // Posting parameters to login url
+                    Map<String, String> params = new HashMap<>();
+                    params.put("id", Integer.toString(id));
+                    return params;
+                }
+
+        };
+
+        // Adding request to request queue
+        queue.add(strReq);
+
 
         //if (state){
             new Handler().postDelayed(new Runnable() {
-
-
                 @Override
                 public void run() {
                     // This method will be executed once the timer is over
-
-                    String url ="http://redoff.bithive.cloud/ws/index";
-                    StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                            new Response.Listener<String>() {
-                                @Override
-                                public void onResponse(String response) {
-                                    Log.d("response", " "+response);
-                                    try {
-                                        saveCategories(response);
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.d("Voller ", "error: "+error.toString());
-                        }
-                    });
-                    // Add the request to the RequestQueue.
-                    queue.add(stringRequest);
-
-                    Intent i = new Intent(SplashActivity.this, MainActivity.class);
-                    i.putExtra("key", key);
+                    Intent i;
+                    if(flag){
+                        i = new Intent(SplashActivity.this, MainActivity.class);
+                    }else{
+                        i = new Intent(SplashActivity.this, LoginActivity.class);
+                    }
+                    i.putExtra("token", id);
                     startActivity(i);
                     finish();
                 }
-            }, 5000);
-        /*else{
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    // This method will be executed once the timer is over
-                    Intent i = new Intent(SplashActivity.this, LoginActivity.class);
-                    startActivity(i);
-                    finish();
-                }
-            }, 2000);
-        }*/
+            }, 1000);
     }
 
     public void saveCategories(String response) throws JSONException {
         Category category = new Category();
-        JSONArray jsonArray = null;
+        JSONArray jsonArray = new JSONArray(response);
         MyDbHelper helper = new MyDbHelper(this, "categories");
         SQLiteDatabase db = helper.getWritableDatabase();
         CategoryDao categoryDao = new CategoryDao(db);
         db.execSQL("delete from categories");
 
-        try {
-            jsonArray = new JSONArray(response);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
         for (int i = 0; i < jsonArray.length(); i++)
         {
             JSONObject jsonObj = null;
@@ -103,8 +114,9 @@ public class SplashActivity extends AppCompatActivity {
                 jsonObj = jsonArray.getJSONObject(i);
             } catch (JSONException e) {
                 e.printStackTrace();
+                Log.d("problema", e.toString());
             }
-            category.setId(jsonObj.getInt("id"));
+            category.setId(Integer.valueOf(jsonObj.getString("id")  ));
             category.setName(jsonObj.getString("name"));
             category.setDetails(jsonObj.getString("details"));
             category.setImage(jsonObj.getString("image"));
