@@ -22,7 +22,7 @@ public class MyDbHelper extends SQLiteOpenHelper {
                 + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + "name TEXT NOT NULL,"
                 + "details TEXT NOT NULL,"
-                + "selected TEXT NOT NULL,"
+                + "selected TEXT NOT NULL DEFAULT 'false',"
                 + "image TEXT NOT NULL,"
                 + "UNIQUE (id))");
     }

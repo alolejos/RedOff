@@ -23,6 +23,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -96,12 +99,18 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                                             // TOMAR LA RESPUESTA... PARSEARLA Y GUARDAR EL NOMBRE EL USUARIO
                                             // EN EL SHARED PREFERENCES... Y EL TOKEN Y GUARDAR LA FLAG
-
-                                            SharedPreferences.Editor ed = sp.edit();
-                                            ed.putString("user", nameText.getText().toString());
-                                            ed.putString("token", response);
-                                            ed.putBoolean("flag", aSwitch.isChecked());
-                                            ed.apply();
+                                            try {
+                                                JSONObject dataLog = new JSONObject(response);
+                                                Log.d("datalog", ""+dataLog.getString("id"));
+                                                SharedPreferences.Editor ed = sp.edit();
+                                                ed.putString("user", nameText.getText().toString());
+                                                ed.putString("token", dataLog.getString("token"));
+                                                ed.putInt("id", dataLog.getInt("id"));
+                                                ed.putBoolean("flag", aSwitch.isChecked());
+                                                ed.apply();
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
+                                            }
 
                                             Intent i = new Intent(LoginActivity.this, MainActivity.class);
                                             i.putExtra("key", response);

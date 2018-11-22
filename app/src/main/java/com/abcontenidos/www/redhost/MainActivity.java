@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
 
 
         Bundle extras = getIntent().getExtras();
-        String key = extras.getString("key");
+        String token = extras.getString("token");
 
         Promotion a = new Promotion("TV 12'", "TV Samsung 12 pulgadas LCD", "AUDIO y VIDEO", BitmapFactory.decodeResource(getResources(), R.drawable.tvlcd));
         Promotion b = new Promotion("20% ACEITES'", "20% de descuento en aceites", "ALIMENTOS", BitmapFactory.decodeResource(getResources(), R.drawable.aceite));
