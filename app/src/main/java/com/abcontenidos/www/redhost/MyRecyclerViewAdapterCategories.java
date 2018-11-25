@@ -3,9 +3,11 @@ package com.abcontenidos.www.redhost;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -39,13 +41,10 @@ public class MyRecyclerViewAdapterCategories extends RecyclerView.Adapter<MyRecy
     // binds the data to the TextView in each cell
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        //holder.imageCategory.setImageURI(Uri.parse(mData.get(position).getImage()));
         holder.textName.setText(mData.get(position).getName());
         holder.textDetails.setText(mData.get(position).getDetails());
         holder.switchSelected.setChecked(Boolean.parseBoolean(mData.get(position).getSelected()));
-        //Picasso.with(context).load(android_versions.get(i).getAndroid_image_url()).resize(120, 60).into(viewHolder.img_android);
         Picasso.get().load(mData.get(position).getImage()).resize(180, 120).into(holder.imageCategory);
-
     }
 
 
@@ -57,7 +56,7 @@ public class MyRecyclerViewAdapterCategories extends RecyclerView.Adapter<MyRecy
 
 
     // stores and recycles views as they are scrolled off screen
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
         TextView textName, textDetails;
         ImageView imageCategory;
         Switch switchSelected;
@@ -68,12 +67,21 @@ public class MyRecyclerViewAdapterCategories extends RecyclerView.Adapter<MyRecy
             textDetails = itemView.findViewById(R.id.textCategoryDetails);
             imageCategory = itemView.findViewById(R.id.imageCategory);
             switchSelected = itemView.findViewById(R.id.switchCategory);
+            switchSelected.setOnCheckedChangeListener(this);
             itemView.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
             if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
+        }
+
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            Log.d("vaca", mData.get(getAdapterPosition()).getSelected().toString());
+            mData.get(getAdapterPosition()).setSelected(Boolean.toString(isChecked));
+            Log.d("vaca1", mData.get(getAdapterPosition()).getSelected().toString());
+
         }
     }
 
@@ -91,4 +99,5 @@ public class MyRecyclerViewAdapterCategories extends RecyclerView.Adapter<MyRecy
     public interface ItemClickListener {
         void onItemClick(View view, int position);
     }
+
 }

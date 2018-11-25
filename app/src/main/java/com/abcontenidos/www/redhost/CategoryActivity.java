@@ -16,10 +16,28 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.Toast;
 
+import com.android.volley.NetworkResponse;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.HttpHeaderParser;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
+
+import org.json.JSONException;
+
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class CategoryActivity extends AppCompatActivity implements MyRecyclerViewAdapterCategories.ItemClickListener, View.OnClickListener {
 
@@ -28,6 +46,8 @@ public class CategoryActivity extends AppCompatActivity implements MyRecyclerVie
     Intent i;
     SharedPreferences sp;
     BottomNavigationView bottomNavigationView;
+    ArrayList<Category> listado;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,35 +58,26 @@ public class CategoryActivity extends AppCompatActivity implements MyRecyclerVie
         setSupportActionBar(myToolbar);
         bottomNavigationView = (BottomNavigationView) findViewById(R.id.my_toolbar_botom);
 
-        MyDbHelper helper = new MyDbHelper(this, "categories");
-        SQLiteDatabase db = helper.getWritableDatabase();
-        CategoryDao categoryDao = new CategoryDao(db);
-
         categorySave = (Button)findViewById(R.id.button_category_save);
         categorySave.setOnClickListener(this);
 
         RecyclerView recyclerView = findViewById(R.id.recycler_category);
 
+        MyDbHelper helper = new MyDbHelper(this, "categories");
+        SQLiteDatabase db = helper.getWritableDatabase();
+        CategoryDao categoryDao = new CategoryDao(db);
+
         int numberOfColumns = 2;
+
+        listado = new ArrayList<>(categoryDao.getall());
         recyclerView.setLayoutManager(new LinearLayoutManager(this  ));
-        adapter = new MyRecyclerViewAdapterCategories(this, categoryDao.getall());
+        adapter = new MyRecyclerViewAdapterCategories(this, listado);
         adapter.setClickListener(this);
         recyclerView.setAdapter(adapter);
 
         sp = getSharedPreferences("Login", MODE_PRIVATE);
     }
 
-    @Override
-    public void onItemClick(View view, int position) {
-
-    }
-
-    @Override
-    public void onClick(View v) {
-
-
-
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -124,5 +135,75 @@ public class CategoryActivity extends AppCompatActivity implements MyRecyclerVie
         Toast toast = Toast.makeText(this, message, Toast.LENGTH_LONG);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
+    }
+
+    @Override
+    public void onItemClick(View view, int position) {
+        Log.d("algo", "item click");
+    }
+
+    @Override
+    public void onClick(View v) {
+        MyDbHelper helper = new MyDbHelper(this, "categories");
+        SQLiteDatabase db = helper.getWritableDatabase();
+        CategoryDao categoryDao = new CategoryDao(db);
+        for (int tr = 0; tr<listado.size(); tr++){
+            categoryDao.update(listado.get(tr));
+        }
+        final String json = new Gson().toJson(listado);
+        Log.d("Json_Gson", json);
+
+        RequestQueue queue;
+
+        queue = Volley.newRequestQueue(this);
+
+        String url ="http://redoff.bithive.cloud/ws/categories_save";
+
+        StringRequest strReq = new StringRequest(
+                Request.Method.POST,
+                url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("respuesta_save", response);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                })  {
+            @Override
+            public String getBodyContentType() {
+                return "application/json; charset=utf-8";
+            }
+
+            @Override
+            public byte[] getBody()  {
+                try {
+                    return json == null ? null : json.getBytes("utf-8");
+                } catch (UnsupportedEncodingException uee) {
+                    VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", json, "utf-8");
+                    return null;
+                }
+            }
+
+            @Override
+            protected Response<String> parseNetworkResponse(NetworkResponse response) {
+                String responseString = "";
+                if (response != null) {
+                    responseString = String.valueOf(response.statusCode);
+                    // can get more details such as response.headers
+                }
+                return Response.success(responseString, HttpHeaderParser.parseCacheHeaders(response));
+            }
+
+        };
+
+        // Adding request to request queue
+        queue.add(strReq);
+
+        finish();
     }
 }

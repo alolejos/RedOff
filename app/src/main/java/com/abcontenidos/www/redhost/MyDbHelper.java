@@ -16,6 +16,7 @@ public class MyDbHelper extends SQLiteOpenHelper {
         this.table = table;
     }
 
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE categories " + " ("
@@ -24,6 +25,17 @@ public class MyDbHelper extends SQLiteOpenHelper {
                 + "details TEXT NOT NULL,"
                 + "selected TEXT NOT NULL DEFAULT 'false',"
                 + "image TEXT NOT NULL,"
+                + "UNIQUE (id))");
+
+        db.execSQL("CREATE TABLE user " + " ("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "name TEXT NOT NULL,"
+                + "mail TEXT NOT NULL,"
+                + "token TEXT NOT NULL,"
+                + "direction TEXT NOT NULL,"
+                + "age TEXT NOT NULL,"
+                + "gender TEXT NOT NULL,"
+                + "birthday TEXT NOT NULL,"
                 + "UNIQUE (id))");
     }
 

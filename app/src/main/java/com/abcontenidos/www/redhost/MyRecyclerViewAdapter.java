@@ -57,6 +57,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
             textName= itemView.findViewById(R.id.textName);
             textDetails = itemView.findViewById(R.id.textDetails);
             imagePromo = itemView.findViewById(R.id.imagePromo);
+
             itemView.setOnClickListener(this);
         }
 

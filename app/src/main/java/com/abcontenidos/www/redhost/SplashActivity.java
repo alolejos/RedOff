@@ -26,8 +26,7 @@ import java.util.Map;
 public class SplashActivity extends AppCompatActivity {
 
     SharedPreferences sp1;
-    String name;
-    Integer id;
+    String name, id;
     RequestQueue queue;
     Boolean flag;
 
@@ -38,8 +37,8 @@ public class SplashActivity extends AppCompatActivity {
 
         sp1 = this.getSharedPreferences("Login", MODE_PRIVATE);
         flag = sp1.getBoolean("flag", false);
-        name = sp1.getString("user", null);
-        id = sp1.getInt("id", 0);
+        name = sp1.getString("User", null);
+        id = sp1.getString("id", "0");
 
         queue = Volley.newRequestQueue(this);
 
@@ -71,7 +70,7 @@ public class SplashActivity extends AppCompatActivity {
                 protected Map<String, String> getParams() {
                     // Posting parameters to login url
                     Map<String, String> params = new HashMap<>();
-                    params.put("id", Integer.toString(id));
+                    params.put("id", id);
                     return params;
                 }
 

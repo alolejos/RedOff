@@ -4,17 +4,16 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
-import android.util.Log;
 
 import java.util.ArrayList;
 
-public class CategoryDao {
+public class UserDao {
 
     private SQLiteDatabase db;
     private SQLiteStatement statementSave;
-    private String tableName = "categories";
+    private String tableName = "user";
 
-    public CategoryDao(SQLiteDatabase db)
+    public UserDao(SQLiteDatabase db)
     {
         this.db=db;
         //statementSave = db.compileStatement("INSERT INTO personas (nombre,edad) VALUES(?,?)");

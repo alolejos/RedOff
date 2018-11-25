@@ -101,11 +101,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                             // EN EL SHARED PREFERENCES... Y EL TOKEN Y GUARDAR LA FLAG
                                             try {
                                                 JSONObject dataLog = new JSONObject(response);
-                                                Log.d("datalog", ""+dataLog.getString("id"));
                                                 SharedPreferences.Editor ed = sp.edit();
-                                                ed.putString("user", nameText.getText().toString());
+                                                ed.putString("User", nameText.getText().toString());
                                                 ed.putString("token", dataLog.getString("token"));
-                                                ed.putInt("id", dataLog.getInt("id"));
+                                                ed.putString("id", dataLog.getString("id"));
                                                 ed.putBoolean("flag", aSwitch.isChecked());
                                                 ed.apply();
                                             } catch (JSONException e) {
@@ -127,7 +126,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             protected Map<String, String> getParams() {
                                 // Posting parameters to login url
                                 Map<String, String> params = new HashMap<>();
-                                params.put("user", nameText.getText().toString());
+                                params.put("User", nameText.getText().toString());
                                 params.put("pass", passwordText.getText().toString());
                                 return params;
                             }
@@ -138,6 +137,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     }else{
                         showToastMessage("Ingrese una dirección de correo válida. Por ejemplo: nombre@dominio.com");
                         nameText.getText().clear();
+                        passwordText.getText().clear();
                     }
                 }
 
