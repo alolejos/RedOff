@@ -1,6 +1,7 @@
 package com.abcontenidos.www.redhost;
 
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -9,6 +10,7 @@ import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -21,6 +23,7 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -29,30 +32,56 @@ import java.util.Date;
 public class ProfileActivity extends AppCompatActivity implements View.OnClickListener {
 
     Toolbar myToolbar;
-    EditText name, mail, pass, direction;
+    EditText name, mail, pass, address, age, gender;
     ImageView imageProfile;
     Button saveProfile;
     static final int REQUEST_TAKE_PHOTO = 1;
     String mCurrentPhotoPath;
     File photoFile;
+    Boolean flag_take_picture = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
+        // Seteo de la Toolbar
         myToolbar = (Toolbar) findViewById(R.id.my_toolbar_profile);
         setSupportActionBar(myToolbar);
 
+        // Seteo de las Views
         name = findViewById(R.id.et_profile_name);
         mail = findViewById(R.id.et_profile_mail);
         pass = findViewById(R.id.et_profile_pass);
-        direction = findViewById(R.id.et_profile_direction);
-        imageProfile = (ImageView) findViewById(R.id.image_profile);
+        address = findViewById(R.id.et_profile_address);
+        age = findViewById(R.id.et_age);
+        gender = findViewById(R.id.et_gender);
+        imageProfile = findViewById(R.id.image_profile);
         saveProfile = findViewById(R.id.save_profile);
 
         imageProfile.setOnClickListener(this);
         saveProfile.setOnClickListener(this);
+
+        // Carga los datos del usuario de la Base de dato a un User
+        MyDbHelper helper = new MyDbHelper(this, "user");
+        SQLiteDatabase db = helper.getWritableDatabase();
+        UserDao userDao = new UserDao(db);
+        User user;
+        user = userDao.get();
+
+        // Pase de datos a los objetos visuales
+        name.setText(user.name);
+        mail.setText(user.mail);
+        pass.setText(user.token);
+        address.setText(user.address);
+        age.setText(user.age);
+        gender.setText(user.age);
+
+        byte[] decodedString = Base64.decode(user.image, Base64.DEFAULT);
+        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+
+        imageProfile.setImageBitmap(decodedByte);
+
 
     }
 
@@ -106,7 +135,25 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                         startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
                     }
                 }
-            break;
+                break;
+
+            case R.id.save_profile:
+                MyDbHelper helper = new MyDbHelper(this, "user");
+                SQLiteDatabase db = helper.getWritableDatabase();
+                UserDao userDao = new UserDao(db);
+
+                User user = new User();
+                user.setName(name.getText().toString());
+                user.setMail(mail.getText().toString());
+                user.setAddress(address.getText().toString());
+                user.setAge(age.getText().toString());
+                user.setGender(gender.getText().toString());
+                if (flag_take_picture) {
+                    user.setImage(getImage());
+                }
+                userDao.update(user);
+                break;
+
         }
 
     }
@@ -134,9 +181,8 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             //imageProfile.setImageBitmap(mImageBitmap);
             //imageProfile.setImageURI(Uri.parse(mCurrentPhotoPath));
             //Picasso.get().load(mCurrentPhotoPath).into(imageProfile);
-            Log.d("fotointent", "bla"+requestCode+" / "+resultCode+" / ");
+            flag_take_picture = true;
             setPic();
-
         }
     }
 
@@ -161,7 +207,42 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         bmOptions.inPurgeable = true;
 
         Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+        ByteArrayOutputStream blob = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 0 /* Ignored for PNGs */, blob);
+        byte[] arrayImagen = blob.toByteArray();
+
+        Bitmap bitmap1 = BitmapFactory.decodeByteArray(arrayImagen, 0, arrayImagen.length);
         imageProfile.setImageBitmap(bitmap);
+    }
+
+    private String getImage() {
+        // Get the dimensions of the View
+        int targetW = imageProfile.getWidth();
+        int targetH = imageProfile.getHeight();
+
+        // Get the dimensions of the bitmap
+        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        bmOptions.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+        int photoW = bmOptions.outWidth;
+        int photoH = bmOptions.outHeight;
+
+        // Determine how much to scale down the image
+        int scaleFactor = Math.min(photoW/targetW, photoH/targetH);
+
+        // Decode the image file into a Bitmap sized to fill the View
+        bmOptions.inJustDecodeBounds = false;
+        bmOptions.inSampleSize = scaleFactor;
+        bmOptions.inPurgeable = true;
+
+        Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+        ByteArrayOutputStream blob = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 0 /* Ignored for PNGs */, blob);
+        String image = blob.toString();
+
+
+
+        return image;
     }
 
 

@@ -32,10 +32,11 @@ public class MyDbHelper extends SQLiteOpenHelper {
                 + "name TEXT NOT NULL,"
                 + "mail TEXT NOT NULL,"
                 + "token TEXT NOT NULL,"
-                + "direction TEXT NOT NULL,"
+                + "address TEXT NOT NULL,"
                 + "age TEXT NOT NULL,"
                 + "gender TEXT NOT NULL,"
                 + "birthday TEXT NOT NULL,"
+                + "image BLOB NOT NULL,"
                 + "UNIQUE (id))");
     }
 

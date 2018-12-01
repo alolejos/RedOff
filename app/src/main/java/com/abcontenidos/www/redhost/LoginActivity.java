@@ -1,7 +1,9 @@
 package com.abcontenidos.www.redhost;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.BitmapFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -40,6 +42,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     Button loginButton;
     Intent intent;
     SharedPreferences sp;
+    Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +61,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         image = (ImageView)findViewById(R.id.loginImage);
         aSwitch = (Switch)findViewById(R.id.switch1);
 
+        context = getApplicationContext();
 
         loginButton.setOnClickListener(this);
         registerText.setOnClickListener(this);
@@ -101,12 +105,23 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                             // EN EL SHARED PREFERENCES... Y EL TOKEN Y GUARDAR LA FLAG
                                             try {
                                                 JSONObject dataLog = new JSONObject(response);
-                                                SharedPreferences.Editor ed = sp.edit();
-                                                ed.putString("User", nameText.getText().toString());
-                                                ed.putString("token", dataLog.getString("token"));
-                                                ed.putString("id", dataLog.getString("id"));
-                                                ed.putBoolean("flag", aSwitch.isChecked());
-                                                ed.apply();
+                                                MyDbHelper helper = new MyDbHelper(context, "user");
+                                                SQLiteDatabase db = helper.getWritableDatabase();
+                                                UserDao userDao = new UserDao(db);
+
+                                                userDao.clear();
+
+                                                User user = new User();
+                                                user.setId(dataLog.getInt("id"));
+                                                user.setName(nameText.getText().toString());
+                                                user.setToken(dataLog.getString("token"));
+                                                user.setAddress(dataLog.getString("address"));
+                                                user.setMail(dataLog.getString("mail"));
+                                                user.setAge(dataLog.getString("age"));
+                                                user.setGender(dataLog.getString("gender"));
+                                                user.setBirthday(dataLog.getString("birthday"));
+                                                user.setImage(dataLog.getString("image"));
+                                                userDao.save(user);
                                             } catch (JSONException e) {
                                                 e.printStackTrace();
                                             }
