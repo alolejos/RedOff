@@ -1,5 +1,6 @@
 package com.abcontenidos.www.redhost;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -16,9 +17,13 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
@@ -29,16 +34,18 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class ProfileActivity extends AppCompatActivity implements View.OnClickListener {
+public class ProfileActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
 
     Toolbar myToolbar;
-    EditText name, mail, pass, address, age, gender;
+    EditText name, mail, pass, address, age, birthday;
+    Spinner spinner;
     ImageView imageProfile;
     Button saveProfile;
     static final int REQUEST_TAKE_PHOTO = 1;
     String mCurrentPhotoPath;
     File photoFile;
     Boolean flag_take_picture = false;
+    User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,18 +62,29 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         pass = findViewById(R.id.et_profile_pass);
         address = findViewById(R.id.et_profile_address);
         age = findViewById(R.id.et_age);
-        gender = findViewById(R.id.et_gender);
+        birthday = findViewById(R.id.et_birthday);
         imageProfile = findViewById(R.id.image_profile);
         saveProfile = findViewById(R.id.save_profile);
+        spinner = findViewById(R.id.et_gender);
+
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource (this,
+                R.array.gender_array, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        spinner.setAdapter(adapter);
 
         imageProfile.setOnClickListener(this);
         saveProfile.setOnClickListener(this);
+        birthday.setOnClickListener(this);
+
+        spinner.setOnItemSelectedListener(this);
 
         // Carga los datos del usuario de la Base de dato a un User
         MyDbHelper helper = new MyDbHelper(this, "user");
         SQLiteDatabase db = helper.getWritableDatabase();
         UserDao userDao = new UserDao(db);
-        User user;
         user = userDao.get();
 
         // Pase de datos a los objetos visuales
@@ -75,7 +93,10 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         pass.setText(user.token);
         address.setText(user.address);
         age.setText(user.age);
-        gender.setText(user.age);
+        int spinnerPosition = adapter.getPosition(user.gender);
+        spinner.setSelection(spinnerPosition);
+
+        //gender.setText(user.age);
 
         byte[] decodedString = Base64.decode(user.image, Base64.DEFAULT);
         Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
@@ -142,16 +163,19 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                 SQLiteDatabase db = helper.getWritableDatabase();
                 UserDao userDao = new UserDao(db);
 
-                User user = new User();
                 user.setName(name.getText().toString());
                 user.setMail(mail.getText().toString());
                 user.setAddress(address.getText().toString());
                 user.setAge(age.getText().toString());
-                user.setGender(gender.getText().toString());
                 if (flag_take_picture) {
                     user.setImage(getImage());
                 }
                 userDao.update(user);
+                finish();
+                break;
+
+            case R.id.et_birthday:
+                showDatePickerDialog();
                 break;
 
         }
@@ -240,10 +264,30 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         bitmap.compress(Bitmap.CompressFormat.JPEG, 0 /* Ignored for PNGs */, blob);
         String image = blob.toString();
 
-
-
         return image;
     }
 
 
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        user.setGender(spinner.getSelectedItem().toString());
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        user.setGender("No dice");
+    }
+
+    private void showDatePickerDialog() {
+        DatePickerFragment newFragment = DatePickerFragment.newInstance(new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                // +1 because january is zero
+                String selectedDate = day + "/" + (month+1) + "/" + year;
+                birthday.setText(selectedDate);
+            }
+        });
+        newFragment.show(getSupportFragmentManager(), "datePicker");
+    }
 }
+

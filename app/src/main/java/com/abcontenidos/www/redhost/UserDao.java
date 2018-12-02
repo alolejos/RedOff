@@ -113,7 +113,7 @@ public class UserDao {
 
     public void clear()
     {
-        db.delete("user","1", null);
+        db.delete("user",null, null);
     }
 }
 
