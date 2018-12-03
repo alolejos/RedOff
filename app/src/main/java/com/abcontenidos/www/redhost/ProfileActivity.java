@@ -93,6 +93,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         pass.setText(user.token);
         address.setText(user.address);
         age.setText(user.age);
+        birthday.setText(user.birthday);
         int spinnerPosition = adapter.getPosition(user.gender);
         spinner.setSelection(spinnerPosition);
 
@@ -175,7 +176,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                 break;
 
             case R.id.et_birthday:
-                showDatePickerDialog();
+                showDatePickerDialog(birthday);
                 break;
 
         }
@@ -278,16 +279,20 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         user.setGender("No dice");
     }
 
-    private void showDatePickerDialog() {
+    private void showDatePickerDialog(final EditText editText) {
         DatePickerFragment newFragment = DatePickerFragment.newInstance(new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker datePicker, int year, int month, int day) {
                 // +1 because january is zero
-                String selectedDate = day + "/" + (month+1) + "/" + year;
-                birthday.setText(selectedDate);
+                final String selectedDate = twoDigits(day) + "/" + twoDigits(month+1) + "/" + year;
+                editText.setText(selectedDate);
             }
         });
         newFragment.show(getSupportFragmentManager(), "datePicker");
+    }
+
+    private String twoDigits(int n) {
+        return (n<=9) ? ("0"+n) : String.valueOf(n);
     }
 }
 

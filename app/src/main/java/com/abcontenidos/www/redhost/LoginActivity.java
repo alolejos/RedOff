@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -77,16 +78,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             case R.id.loginButton:
                 String user = nameText.getText().toString();
                 String password = passwordText.getText().toString();
-                String emailPattern = "^[_a-z0-9-]+(\\.[_a-z0-9-]+)*@" +
-                        "[a-z0-9-]+(\\.[a-z0-9-]+)*(\\.[a-z]{2,4})$";
-                Pattern pattern = Pattern.compile(emailPattern);
                 if (user.trim().length()==0 || password.trim().length()==0) {
                     showToastMessage("Alguno de los campos están vacíos. Ingrese correo y contraseña");
                     nameText.getText().clear();
                     passwordText.getText().clear();
                 }else {
-                    Matcher matcher = pattern.matcher(user);
-                    if (matcher.matches()) {
+                    if (Patterns.EMAIL_ADDRESS.matcher(user).matches()) {
                         RequestQueue queue = Volley.newRequestQueue(this);
                         String url ="http://redoff.bithive.cloud/ws/login";
                         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
