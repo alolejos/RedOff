@@ -2,8 +2,7 @@ package com.abcontenidos.www.redhost;
 
 
 public class User {
-    String name, mail, token, address, age, gender, birthday, image;
-    Integer id;
+    String id, name, mail, token, address, gender, birthday, image;
 
     public String getName() {
         return name;
@@ -37,14 +36,6 @@ public class User {
         this.address = address;
     }
 
-    public String getAge() {
-        return age;
-    }
-
-    public void setAge(String age) {
-        this.age = age;
-    }
-
     public String getGender() {
         return gender;
     }
@@ -61,11 +52,11 @@ public class User {
         this.birthday = birthday;
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -82,13 +73,12 @@ public class User {
 
     }
 
-    public User(String name, String mail, String token, String address, String age, String gender, String birthday, Integer id, String image) {
+    public User(String name, String mail, String token, String address, String gender, String birthday, String id, String image) {
         this.id = id;
         this.name = name;
         this.mail = mail;
         this.token = token;
         this.address = address;
-        this.age = age;
         this.gender = gender;
         this.birthday = birthday;
         this.image = image;

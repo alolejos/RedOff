@@ -29,15 +29,23 @@ public class MyDbHelper extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE user " + " ("
                 + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "id_base TEXT NOT NULL,"
                 + "name TEXT NOT NULL,"
                 + "mail TEXT NOT NULL,"
                 + "token TEXT NOT NULL,"
                 + "address TEXT NOT NULL,"
-                + "age TEXT NOT NULL,"
                 + "gender TEXT NOT NULL,"
                 + "birthday TEXT NOT NULL,"
                 + "image BLOB NOT NULL,"
                 + "UNIQUE (id))");
+        db.execSQL("CREATE TABLE posts " + " ("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "name TEXT NOT NULL,"
+                + "details TEXT NOT NULL,"
+                + "category TEXT NOT NULL,"
+                + "image TEXT NOT NULL,"
+                + "UNIQUE (id))");
+
     }
 
     @Override

@@ -19,20 +19,25 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import okio.Utf8;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -90,6 +95,33 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                 new Response.Listener<String>() {
                                     @Override
                                     public void onResponse(String response) {
+                                        Log.d("respuesta", response);
+                                        MyDbHelper helper = new MyDbHelper(context, "user");
+                                        SQLiteDatabase db = helper.getWritableDatabase();
+                                        UserDao userDao = new UserDao(db);
+                                        userDao.clear();
+                                        try {
+                                            JSONObject jsonResponse = new JSONObject(response);
+                                            JSONObject data = jsonResponse.getJSONObject("data");
+                                            String error = data.getString("error");
+                                            if (error.equals("1")){
+                                                showToastMessage("Error de usuario/contraseña");
+                                            }else{
+                                                JSONObject listado = data.getJSONObject("message");
+                                                User user = new User();
+                                                user.setId(listado.getString("id"));
+                                                user.setName(listado.getString("fullname"));
+                                                user.setToken(jsonResponse.getString("token"));
+                                                user.setAddress(listado.getString("address"));
+                                                user.setMail(listado.getString("email"));
+                                                user.setGender(listado.getString("gender"));
+                                                user.setBirthday(listado.getString("birthday"));
+                                                user.setImage(listado.getString("image"));
+                                                userDao.save(user);
+                                            }
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
                                         if(response.equals("none"))
                                         {
                                             showToastMessage("El mail ingresado no está en nuestros registros, ingrese un email válido.");
@@ -100,28 +132,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                                             // TOMAR LA RESPUESTA... PARSEARLA Y GUARDAR EL NOMBRE EL USUARIO
                                             // EN EL SHARED PREFERENCES... Y EL TOKEN Y GUARDAR LA FLAG
-                                            try {
-                                                JSONObject dataLog = new JSONObject(response);
-                                                MyDbHelper helper = new MyDbHelper(context, "user");
-                                                SQLiteDatabase db = helper.getWritableDatabase();
-                                                UserDao userDao = new UserDao(db);
-
-                                                userDao.clear();
-
-                                                User user = new User();
-                                                user.setId(dataLog.getInt("id"));
-                                                user.setName(nameText.getText().toString());
-                                                user.setToken(dataLog.getString("token"));
-                                                user.setAddress(dataLog.getString("address"));
-                                                user.setMail(dataLog.getString("mail"));
-                                                user.setAge(dataLog.getString("age"));
-                                                user.setGender(dataLog.getString("gender"));
-                                                user.setBirthday(dataLog.getString("birthday"));
-                                                user.setImage(dataLog.getString("image"));
-                                                userDao.save(user);
-                                            } catch (JSONException e) {
-                                                e.printStackTrace();
-                                            }
 
                                             Intent i = new Intent(LoginActivity.this, MainActivity.class);
                                             i.putExtra("key", response);
@@ -138,11 +148,39 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             protected Map<String, String> getParams() {
                                 // Posting parameters to login url
                                 Map<String, String> params = new HashMap<>();
-                                params.put("User", nameText.getText().toString());
-                                params.put("pass", passwordText.getText().toString());
+                                //params.put("user", nameText.getText().toString());
+                                //params.put("pass", passwordText.getText().toString());
                                 return params;
                             }
 
+                            @Override
+                            public byte[] getBody()  {
+                                JSONObject data = new JSONObject();
+                                byte[] sendBody = null;
+                                try {
+                                    data.put("user", nameText.getText().toString());
+                                    data.put("pass", passwordText.getText().toString());
+                                    sendBody = data.toString().getBytes("utf-8");
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                } catch (UnsupportedEncodingException e) {
+                                    e.printStackTrace();
+                                } finally {
+                                    return sendBody;
+                                }
+                            }
+
+                            /*@Override
+                            public Map<String, String> getHeaders() throws AuthFailureError {
+                                Map<String, String>  params = new HashMap<String, String>();
+                                params.put("Content-Type", "application/json");
+                                return params;
+                            }*/
+
+                            @Override
+                            public String getBodyContentType() {
+                                return "application/json; charset=utf-8";
+                            }
                         };
                         // Add the request to the RequestQueue.
                         queue.add(stringRequest);

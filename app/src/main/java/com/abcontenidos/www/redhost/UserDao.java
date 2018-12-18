@@ -24,21 +24,20 @@ public class UserDao {
     {
         Cursor c;
         User user = null;
-        c = db.rawQuery("SELECT id, name, mail, token, address, age, gender, birthday, image" +
+        c = db.rawQuery("SELECT id, name, mail, token, address, gender, birthday, image" +
                 " FROM user WHERE 1",null);
 
         if(c.moveToFirst())
         {
             user = new User();
-            user.setId(c.getInt(0));
+            user.setId(c.getString(0));
             user.setName(c.getString(1));
             user.setMail(c.getString(2));
             user.setToken(c.getString(3));
             user.setAddress(c.getString(4));
-            user.setAge(c.getString(5));
-            user.setGender(c.getString(6));
-            user.setBirthday(c.getString(7));
-            user.setImage(c.getString(8));
+            user.setGender(c.getString(5));
+            user.setBirthday(c.getString(6));
+            user.setImage(c.getString(7));
         }
         c.close();
         return user;
@@ -55,12 +54,11 @@ public class UserDao {
         {
             do{
                 user = new User();
-                user.setId(c.getInt(0));
+                user.setId(c.getString(0));
                 user.setName(c.getString(1));
                 user.setMail(c.getString(2));
                 user.setToken(c.getString(3));
                 user.setAddress(c.getString(5));
-                user.setAge(c.getString(6));
                 user.setGender(c.getString(7));
                 user.setBirthday(c.getString(8));
                 user.setImage(c.getString(9));
@@ -79,12 +77,11 @@ public class UserDao {
         //return statementSave.executeInsert();
         Log.d("User_dentro", "address:  "+user.address);
         ContentValues values = new ContentValues();
-        values.put("id", user.getId());
+        values.put("id_base", user.getId());
         values.put("name", user.getName());
         values.put("mail", user.getMail());
         values.put("token", user.getToken());
         values.put("address", user.getAddress());
-        values.put("age", user.getAge());
         values.put("gender", user.getGender());
         values.put("birthday", user.getBirthday());
         values.put("image", user.getImage());
@@ -99,7 +96,6 @@ public class UserDao {
         values.put("mail", user.getMail());
         values.put("token", user.getToken());
         values.put("address", user.getAddress());
-        values.put("age", user.getAge());
         values.put("gender", user.getGender());
         values.put("birthday", user.getBirthday());
         values.put("image", user.getImage());

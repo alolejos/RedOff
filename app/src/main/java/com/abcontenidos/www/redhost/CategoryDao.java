@@ -24,8 +24,8 @@ public class CategoryDao {
     {
         Cursor c;
         Category category = null;
-        c = db.rawQuery("SELECT _id,nombre,edad" +
-                " FROM personas WHERE _id=" +id,null);
+        c = db.rawQuery("SELECT id,nombre,edad" +
+                " FROM personas WHERE id=" +id,null);
 
         if(c.moveToFirst())
         {

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -12,7 +13,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,18 +26,30 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.squareup.picasso.Picasso;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ProfileActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
 
     Toolbar myToolbar;
-    EditText name, mail, pass, address, age, birthday;
+    EditText name, mail, pass, address, birthday;
     Spinner spinner;
     ImageView imageProfile;
     Button saveProfile;
@@ -61,7 +73,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         mail = findViewById(R.id.et_profile_mail);
         pass = findViewById(R.id.et_profile_pass);
         address = findViewById(R.id.et_profile_address);
-        age = findViewById(R.id.et_age);
         birthday = findViewById(R.id.et_birthday);
         imageProfile = findViewById(R.id.image_profile);
         saveProfile = findViewById(R.id.save_profile);
@@ -87,16 +98,26 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         UserDao userDao = new UserDao(db);
         user = userDao.get();
 
+        // formatear la fecha
+        String inputTimeStamp = user.getBirthday();
+        try {
+            final String inputFormat = "yyyy-MM-dd";
+            final String outputFormat = "dd/MM/yyyy";
+            inputTimeStamp = TimeStampConverter(inputFormat, inputTimeStamp,
+                    outputFormat);
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
         // Pase de datos a los objetos visuales
         name.setText(user.name);
         mail.setText(user.mail);
         pass.setText(user.token);
         address.setText(user.address);
-        age.setText(user.age);
-        birthday.setText(user.birthday);
+        birthday.setText(inputTimeStamp);
         int spinnerPosition = adapter.getPosition(user.gender);
         spinner.setSelection(spinnerPosition);
-
         //gender.setText(user.age);
 
         byte[] decodedString = Base64.decode(user.image, Base64.DEFAULT);
@@ -160,18 +181,85 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                 break;
 
             case R.id.save_profile:
+                String birthdayString = null;
+                // formatear la fecha
+                try {
+                    final String inputFormat = "dd/MM/yyyy";
+                    final String outputFormat = "yyyy-MM-dd";
+                    birthdayString = TimeStampConverter(inputFormat, birthday.getText().toString(),
+                            outputFormat);
+                } catch (ParseException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
+                // Base de datos
                 MyDbHelper helper = new MyDbHelper(this, "user");
                 SQLiteDatabase db = helper.getWritableDatabase();
                 UserDao userDao = new UserDao(db);
 
+                // Carga del objeto user
                 user.setName(name.getText().toString());
                 user.setMail(mail.getText().toString());
                 user.setAddress(address.getText().toString());
-                user.setAge(age.getText().toString());
-                if (flag_take_picture) {
-                    user.setImage(getImage());
-                }
+                user.setBirthday(birthday.getText().toString());
+                user.setGender(spinner.getSelectedItem().toString());
+                Bitmap bm = ((BitmapDrawable)imageProfile.getDrawable()).getBitmap();
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                bm.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+                byte[] encodedString = byteArrayOutputStream.toByteArray();
+                String toBase64 = Base64.encodeToString(encodedString, Base64.DEFAULT);
+                user.setImage(toBase64);
+                // Guardado en base de datos
                 userDao.update(user);
+
+                Gson gson = new Gson();
+                final String json = gson.toJson(user);
+                RequestQueue queue = Volley.newRequestQueue(this);
+                String url ="http://redoff.bithive.cloud/ws/profile";
+                StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                try {
+                                    JSONObject jsonResponse = new JSONObject(response);
+
+                                    if (jsonResponse.getString("data").equals("Ok")){
+                                        showToastMessage("Guardado");
+                                    }else{
+                                        showToastMessage("Error!");
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        showToastMessage("That didn't work! -- "+error.toString());
+                    }
+                }) {
+                    @Override
+                    public Map<String, String> getHeaders()  {
+                        // Posting parameters to login url
+                        Map<String, String> headers = new HashMap<>();
+                        String auth = "Bearer "+user.getToken();
+                        headers.put("Authorization", auth);
+                        return headers;
+                    }
+
+                    @Override
+                    public byte[] getBody()  {
+                        return json.toString().getBytes();
+                    }
+
+                    @Override
+                    public String getBodyContentType() {
+                        return "application/json; charset=utf-8";
+                    }
+                };
+                // Add the request to the RequestQueue.
+                queue.add(stringRequest);
                 finish();
                 break;
 
@@ -265,6 +353,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         bitmap.compress(Bitmap.CompressFormat.JPEG, 0 /* Ignored for PNGs */, blob);
         String image = blob.toString();
 
+
         return image;
     }
 
@@ -293,6 +382,13 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     private String twoDigits(int n) {
         return (n<=9) ? ("0"+n) : String.valueOf(n);
+    }
+
+    private static String TimeStampConverter(final String inputFormat,
+                                             String inputTimeStamp, final String outputFormat)
+            throws ParseException {
+        return new SimpleDateFormat(outputFormat).format(new SimpleDateFormat(
+                inputFormat).parse(inputTimeStamp));
     }
 }
 
