@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -49,7 +50,7 @@ import java.util.Map;
 public class ProfileActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
 
     Toolbar myToolbar;
-    EditText name, mail, pass, address, birthday;
+    EditText name, mail, address, birthday;
     Spinner spinner;
     ImageView imageProfile;
     Button saveProfile;
@@ -71,7 +72,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         // Seteo de las Views
         name = findViewById(R.id.et_profile_name);
         mail = findViewById(R.id.et_profile_mail);
-        pass = findViewById(R.id.et_profile_pass);
         address = findViewById(R.id.et_profile_address);
         birthday = findViewById(R.id.et_birthday);
         imageProfile = findViewById(R.id.image_profile);
@@ -113,7 +113,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         // Pase de datos a los objetos visuales
         name.setText(user.name);
         mail.setText(user.mail);
-        pass.setText(user.token);
         address.setText(user.address);
         birthday.setText(inputTimeStamp);
         int spinnerPosition = adapter.getPosition(user.gender);
@@ -221,6 +220,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                         new Response.Listener<String>() {
                             @Override
                             public void onResponse(String response) {
+                                Log.d("Quehay", response);
                                 try {
                                     JSONObject jsonResponse = new JSONObject(response);
 
@@ -266,7 +266,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             case R.id.et_birthday:
                 showDatePickerDialog(birthday);
                 break;
-
         }
 
     }
@@ -384,11 +383,8 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         return (n<=9) ? ("0"+n) : String.valueOf(n);
     }
 
-    private static String TimeStampConverter(final String inputFormat,
-                                             String inputTimeStamp, final String outputFormat)
-            throws ParseException {
-        return new SimpleDateFormat(outputFormat).format(new SimpleDateFormat(
-                inputFormat).parse(inputTimeStamp));
+    private static String TimeStampConverter(final String inputFormat, String inputTimeStamp, final String outputFormat) throws ParseException {
+            return new SimpleDateFormat(outputFormat).format(new SimpleDateFormat(inputFormat).parse(inputTimeStamp));
     }
 }
 

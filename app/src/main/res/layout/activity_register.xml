@@ -31,7 +31,7 @@
                  android:layout_height="180dp"
                  android:adjustViewBounds="false"
                  android:padding="5dp"
-                 app:srcCompat="@mipmap/person_black" />
+                 app:srcCompat="@drawable/person_black" />
 
 
             <android.support.design.widget.TextInputLayout
@@ -44,7 +44,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:ems="10"
-                    android:hint="correo electrónico"
+                    android:hint="Mail/Usuario"
                     android:inputType="textEmailAddress" />
             </android.support.design.widget.TextInputLayout>
 
@@ -108,26 +108,15 @@
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
-                android:id="@+id/tilAge"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal">
-
-                <EditText
-                    android:id="@+id/et_register_age"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:ems="10"
-                    android:inputType="number"
-                    android:hint="Edad"/>
-            </android.support.design.widget.TextInputLayout>
-
-            <android.support.design.widget.TextInputLayout
                 android:id="@+id/tilGender"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Género"
                 android:gravity="center_horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Genero"/>
                 <Spinner
                     android:id="@+id/et_register_gender"
                     android:layout_width="wrap_content"

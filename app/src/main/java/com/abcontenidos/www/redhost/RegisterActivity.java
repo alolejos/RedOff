@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -20,6 +21,7 @@ import android.telephony.TelephonyManager;
 import android.util.Base64;
 import android.util.Log;
 import android.util.Patterns;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -30,17 +32,30 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
 
     Toolbar myToolbar;
-    EditText name, mail, pass, repass, address, age, birthday;
+    EditText name, mail, pass, repass, address, birthday;
     Spinner spinner;
     ImageView imageProfile;
     Button buttonRegister;
@@ -65,7 +80,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         pass = findViewById(R.id.et_register_pass);
         repass = findViewById(R.id.et_register_repass);
         address = findViewById(R.id.et_register_address);
-        age = findViewById(R.id.et_register_age);
         birthday = findViewById(R.id.et_register_birthday);
         imageProfile = findViewById(R.id.image_register);
         buttonRegister = findViewById(R.id.save_register);
@@ -96,24 +110,60 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 // PRIMERO VALIDAR LOS DATOS
                 Log.d("entra en boton", "boton");
                 validarDatos();
-                // SEGUNDO LO ENVIAMOS AL WS PARA SU INGRESO AL SISTEMA
 
-                // TERCERO, TOMAMOS LA RESPUESTA DEL WS Y LO GARDAMOS EN LA BASE DE DATOS
-                /*MyDbHelper helper = new MyDbHelper(this, "user");
-                SQLiteDatabase db = helper.getWritableDatabase();
-                UserDao userDao = new UserDao(db);
-
-                user.setName(name.getText().toString());
-                user.setMail(name.getText().toString());
+                user.setGender(spinner.getSelectedItem().toString());
+                user.setBirthday(birthday.getText().toString());
                 user.setAddress(address.getText().toString());
-                user.setAge(age.getText().toString());
-                if (flag_take_picture) {
-                    //user.setImage(getImage());
-                }
-                userDao.save(user);
-                */
+                user.setMail(mail.getText().toString());
+                user.setName(name.getText().toString());
 
-                //finish();
+                Bitmap bm = ((BitmapDrawable)imageProfile.getDrawable()).getBitmap();
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                bm.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+                byte[] encodedString = byteArrayOutputStream.toByteArray();
+                String toBase64 = Base64.encodeToString(encodedString, Base64.DEFAULT);
+                user.setImage(toBase64);
+
+                Gson gson = new Gson();
+                final String json = gson.toJson(user);
+                RequestQueue queue = Volley.newRequestQueue(this);
+                String url ="http://redoff.bithive.cloud/ws/register";
+                StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+
+                                try {
+                                    JSONObject jsonResponse = new JSONObject(response);
+
+                                    if (jsonResponse.getString("data").equals("Ok")){
+                                        showToastMessage("Guardado");
+                                    }else{
+                                        showToastMessage("Error!");
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        showToastMessage("That didn't work! -- "+error.toString());
+                    }
+                }) {
+                    @Override
+                    public byte[] getBody()  {
+                        return json.toString().getBytes();
+                    }
+
+                    @Override
+                    public String getBodyContentType() {
+                        return "application/json; charset=utf-8";
+                    }
+                };
+                // Add the request to the RequestQueue.
+                queue.add(stringRequest);
+                finish();
                 break;
 
             case R.id.et_register_birthday:
@@ -298,11 +348,17 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
         if (a && b && c) {
             // OK, se pasa a la siguiente acción
-            Toast.makeText(this, "Se guarda el registro", Toast.LENGTH_LONG).show();
+            //Toast.makeText(this, "Se guarda el registro", Toast.LENGTH_LONG).show();
         }else {
             Toast.makeText(this, "Todo mal... hay que ingresar todo de vuelta", Toast.LENGTH_LONG).show();
         }
 
+    }
+
+    private void showToastMessage (String message) {
+        Toast toast = Toast.makeText(this, message, Toast.LENGTH_LONG);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
     }
 
 

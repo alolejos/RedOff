@@ -106,6 +106,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                             String error = data.getString("error");
                                             if (error.equals("1")){
                                                 showToastMessage("Error de usuario/contraseña");
+                                                nameText.getText().clear();
+                                                passwordText.getText().clear();
                                             }else{
                                                 JSONObject listado = data.getJSONObject("message");
                                                 User user = new User();
@@ -118,24 +120,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                                 user.setBirthday(listado.getString("birthday"));
                                                 user.setImage(listado.getString("image"));
                                                 userDao.save(user);
+                                                Intent i = new Intent(LoginActivity.this, MainActivity.class);
+                                                i.putExtra("key", response);
+                                                startActivity(i);
                                             }
                                         } catch (JSONException e) {
                                             e.printStackTrace();
-                                        }
-                                        if(response.equals("none"))
-                                        {
-                                            showToastMessage("El mail ingresado no está en nuestros registros, ingrese un email válido.");
-                                            nameText.getText().clear();
-                                            passwordText.getText().clear();
-                                        }else {
-
-
-                                            // TOMAR LA RESPUESTA... PARSEARLA Y GUARDAR EL NOMBRE EL USUARIO
-                                            // EN EL SHARED PREFERENCES... Y EL TOKEN Y GUARDAR LA FLAG
-
-                                            Intent i = new Intent(LoginActivity.this, MainActivity.class);
-                                            i.putExtra("key", response);
-                                            startActivity(i);
                                         }
                                     }
                                 }, new Response.ErrorListener() {
