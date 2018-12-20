@@ -29,6 +29,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -63,8 +64,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     String mCurrentPhotoPath;
     File photoFile;
     Boolean flag_take_picture = false;
-    User user;
     TextInputLayout tilName, tilMail, tilPass, tilRePass, tilAddress;
+    ProgressBar progressBar;
 
 
     @Override
@@ -91,6 +92,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         tilRePass = findViewById(R.id.tilRePass);
         tilAddress = findViewById(R.id.tilAddress);
 
+        progressBar = findViewById(R.id.progressBar);
+
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource (this,
                 R.array.gender_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -108,9 +111,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         switch (v.getId()){
             case R.id.save_register:
                 // PRIMERO VALIDAR LOS DATOS
-                Log.d("entra en boton", "boton");
                 validarDatos();
-
+                User user = new User();
+                user.setPass(pass.getText().toString());
                 user.setGender(spinner.getSelectedItem().toString());
                 user.setBirthday(birthday.getText().toString());
                 user.setAddress(address.getText().toString());
@@ -132,18 +135,16 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                         new Response.Listener<String>() {
                             @Override
                             public void onResponse(String response) {
-
-                                try {
-                                    JSONObject jsonResponse = new JSONObject(response);
-
-                                    if (jsonResponse.getString("data").equals("Ok")){
-                                        showToastMessage("Guardado");
+                                Log.d("registrando", response);
+                                    if (response.equals("Ok")) {
+                                        showToastMessage("Ahora ingrese a su mail para activar la cuenta");
+                                        progressBar.setVisibility(View.GONE);
+                                        finish();
                                     }else{
-                                        showToastMessage("Error!");
+                                        showToastMessage("Error en la creacion de cuenta");
+                                        progressBar.setVisibility(View.GONE);
+                                        finish();
                                     }
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
                             }
                         }, new Response.ErrorListener() {
                     @Override
@@ -163,7 +164,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 };
                 // Add the request to the RequestQueue.
                 queue.add(stringRequest);
-                finish();
+                progressBar.setVisibility(View.VISIBLE);
                 break;
 
             case R.id.et_register_birthday:

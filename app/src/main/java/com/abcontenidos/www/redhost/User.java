@@ -2,7 +2,15 @@ package com.abcontenidos.www.redhost;
 
 
 public class User {
-    String id, name, mail, token, address, gender, birthday, image;
+    String id, name, mail, token, address, gender, birthday, image, pass;
+
+    public String getPass() {
+        return pass;
+    }
+
+    public void setPass(String pass) {
+        this.pass = pass;
+    }
 
     public String getName() {
         return name;
@@ -73,7 +81,7 @@ public class User {
 
     }
 
-    public User(String name, String mail, String token, String address, String gender, String birthday, String id, String image) {
+    public User(String name, String mail, String token, String address, String gender, String birthday, String id, String image, String pass) {
         this.id = id;
         this.name = name;
         this.mail = mail;
@@ -82,6 +90,7 @@ public class User {
         this.gender = gender;
         this.birthday = birthday;
         this.image = image;
+        this.pass = pass ;
 
     }
 
