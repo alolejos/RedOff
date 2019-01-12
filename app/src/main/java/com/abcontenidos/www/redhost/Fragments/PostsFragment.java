@@ -2,7 +2,6 @@ package com.abcontenidos.www.redhost.Fragments;
 
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -16,7 +15,7 @@ import com.abcontenidos.www.redhost.Dbases.MyDbHelper;
 import com.abcontenidos.www.redhost.MyRecyclerViewAdapter;
 import com.abcontenidos.www.redhost.Objets.Post;
 import com.abcontenidos.www.redhost.Dbases.PostDao;
-import com.abcontenidos.www.redhost.PostInfo;
+import com.abcontenidos.www.redhost.Activities.PostInfo;
 import com.abcontenidos.www.redhost.R;
 import com.abcontenidos.www.redhost.Objets.User;
 import com.abcontenidos.www.redhost.Dbases.UserDao;
@@ -83,8 +82,6 @@ public class PostsFragment extends Fragment implements MyRecyclerViewAdapter.Ite
         postDao= new PostDao(db1);
         list = postDao.getall();
 
-        Log.d("lista", ": "+list.size());
-
         // carga del Recyclerview
         recyclerView = view.findViewById(R.id.recycler_main);
         int numberOfColumns = 4;
@@ -104,7 +101,8 @@ public class PostsFragment extends Fragment implements MyRecyclerViewAdapter.Ite
     @Override
     public void onItemClick(View view, int position) {
         i = new Intent(getActivity(), PostInfo.class);
-        i.putExtra("key", position);
+        i.putExtra("key", Integer.valueOf(list.get(position).getId()));
+        Log.d("key", list.get(position).getId());
         startActivity(i);
     }
 

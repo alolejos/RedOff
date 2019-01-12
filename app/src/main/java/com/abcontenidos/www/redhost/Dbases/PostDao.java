@@ -78,6 +78,8 @@ public class PostDao {
         values.put("image", post.getImage());
         values.put("category", post.getCategory());
         values.put("commerce", post.getCommerce());
+        values.put("address", post.getAddresscommece());
+        values.put("phone", post.getCelcommerce());
         return  db.insert(tableName, null, values);
     }
 

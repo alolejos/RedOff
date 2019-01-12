@@ -46,6 +46,8 @@ public class MyDbHelper extends SQLiteOpenHelper {
                 + "category TEXT NOT NULL,"
                 + "image TEXT NOT NULL,"
                 + "commerce TEXT NOT NULL,"
+                + "address TEXT NOT NULL,"
+                + "phone TEXT NOT NULL,"
                 + "UNIQUE (id))");
 
     }

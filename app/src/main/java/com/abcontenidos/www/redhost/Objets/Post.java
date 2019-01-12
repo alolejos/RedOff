@@ -1,7 +1,23 @@
 package com.abcontenidos.www.redhost.Objets;
 
 public class Post {
-    String id, name, details, category, image, commerce;
+    String id, name, details, category, image, commerce, addresscommece, celcommerce;
+
+    public String getAddresscommece() {
+        return addresscommece;
+    }
+
+    public void setAddresscommece(String addresscommece) {
+        this.addresscommece = addresscommece;
+    }
+
+    public String getCelcommerce() {
+        return celcommerce;
+    }
+
+    public void setCelcommerce(String celcommerce) {
+        this.celcommerce = celcommerce;
+    }
 
     public String getId() {
         return id;
@@ -51,13 +67,15 @@ public class Post {
         this.commerce = commerce;
     }
 
-    public Post(String id, String name, String details, String category, String image, String commerce) {
+    public Post(String id, String name, String details, String category, String image, String commerce, String addresscommece, String celcommerce) {
         this.id = id;
         this.name = name;
         this.details = details;
         this.category = category;
         this.image = image;
         this.commerce = commerce;
+        this.addresscommece = addresscommece;
+        this.celcommerce = celcommerce;
     }
 
     public Post(){}

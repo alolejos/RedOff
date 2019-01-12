@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:gravity="center_horizontal"
     android:padding="20dp"
-    tools:context=".PostInfo">
+    tools:context=".Activities.PostInfo">
 
     <ImageView
         android:id="@+id/imagePost"
@@ -49,4 +49,19 @@
         android:textSize="24sp"
         tools:layout_editor_absoluteX="131dp"
         tools:layout_editor_absoluteY="161dp" />
+
+    <TextView
+        android:id="@+id/infoAddressCommerce"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat" />
+
+    <TextView
+        android:id="@+id/infoTelCommerce"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        android:textAlignment="center" />
 </LinearLayout>

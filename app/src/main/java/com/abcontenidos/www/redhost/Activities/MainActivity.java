@@ -21,7 +21,6 @@ import com.abcontenidos.www.redhost.MyRecyclerViewAdapter;
 import com.abcontenidos.www.redhost.Objets.Post;
 import com.abcontenidos.www.redhost.Objets.User;
 import com.abcontenidos.www.redhost.Dbases.PostDao;
-import com.abcontenidos.www.redhost.PostInfo;
 import com.abcontenidos.www.redhost.R;
 import com.abcontenidos.www.redhost.Dbases.UserDao;
 

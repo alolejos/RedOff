@@ -33,7 +33,7 @@
         <activity android:name=".Activities.CategoryActivity" />
         <activity android:name=".Activities.TermsActivity" />
         <activity android:name=".Activities.ProfileActivity" />
-        <activity android:name=".PostInfo" />
+        <activity android:name=".Activities.PostInfo" />
         <activity android:name=".Activities.PrincipalActivity" />
     </application>
 
