@@ -1,12 +1,10 @@
-package com.abcontenidos.www.redhost;
+package com.abcontenidos.www.redhost.Activities;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -16,27 +14,29 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.Toast;
 
-import com.android.volley.NetworkResponse;
+import com.abcontenidos.www.redhost.Dbases.CategoryDao;
+import com.abcontenidos.www.redhost.Dbases.MyDbHelper;
+import com.abcontenidos.www.redhost.MyRecyclerViewAdapterCategories;
+import com.abcontenidos.www.redhost.Objets.Category;
+import com.abcontenidos.www.redhost.Objets.User;
+import com.abcontenidos.www.redhost.R;
+import com.abcontenidos.www.redhost.Dbases.UserDao;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class CategoryActivity extends AppCompatActivity implements MyRecyclerViewAdapterCategories.ItemClickListener, View.OnClickListener {
@@ -44,9 +44,11 @@ public class CategoryActivity extends AppCompatActivity implements MyRecyclerVie
     MyRecyclerViewAdapterCategories adapter;
     Button categorySave;
     Intent i;
-    SharedPreferences sp;
     BottomNavigationView bottomNavigationView;
     ArrayList<Category> listado;
+    MyDbHelper helper;
+    User user;
+    Switch selected;
 
 
     @Override
@@ -54,28 +56,31 @@ public class CategoryActivity extends AppCompatActivity implements MyRecyclerVie
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_category);
 
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar1);
+        Toolbar myToolbar = findViewById(R.id.my_toolbar1);
         setSupportActionBar(myToolbar);
-        bottomNavigationView = (BottomNavigationView) findViewById(R.id.my_toolbar_botom);
+        bottomNavigationView = findViewById(R.id.my_toolbar_botom);
 
-        categorySave = (Button)findViewById(R.id.button_category_save);
+        categorySave = findViewById(R.id.button_category_save);
+
         categorySave.setOnClickListener(this);
 
         RecyclerView recyclerView = findViewById(R.id.recycler_category);
 
-        MyDbHelper helper = new MyDbHelper(this, "categories");
+        helper = new MyDbHelper(this, "categories");
         SQLiteDatabase db = helper.getWritableDatabase();
         CategoryDao categoryDao = new CategoryDao(db);
-
-        int numberOfColumns = 2;
-
         listado = new ArrayList<>(categoryDao.getall());
-        recyclerView.setLayoutManager(new LinearLayoutManager(this  ));
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(this ));
         adapter = new MyRecyclerViewAdapterCategories(this, listado);
         adapter.setClickListener(this);
         recyclerView.setAdapter(adapter);
 
-        sp = getSharedPreferences("Login", MODE_PRIVATE);
+        MyDbHelper helperUser = new MyDbHelper(this, "user");
+        SQLiteDatabase db1 = helperUser.getWritableDatabase();
+        UserDao userDao = new UserDao(db1);
+        user = userDao.get();
+
     }
 
 
@@ -86,7 +91,6 @@ public class CategoryActivity extends AppCompatActivity implements MyRecyclerVie
 
         // Inflate and initialize the bottom menu
         Menu bottomMenu = bottomNavigationView.getMenu();
-        Log.d("tamaño", "= "+bottomMenu.size());
         for (int i = 0; i < bottomMenu.size(); i++) {
             bottomMenu.getItem(i).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
@@ -109,16 +113,14 @@ public class CategoryActivity extends AppCompatActivity implements MyRecyclerVie
                 showToastMessage("Red Off es una aplicacion bla bla bla bla \n Desarrollado por Abcontenidos.com");
                 break;
             case R.id.action_logout:
-                SharedPreferences.Editor ed = sp.edit();
-                ed.clear();
-                ed.apply();
+                helper.close();
                 i = new Intent(this, LoginActivity.class);
                 startActivity(i);
                 break;
             case R.id.action_botom_main:
                 finish();
                 break;
-            case R.id.action_botom_favorites:
+            case R.id.action_botom_categories:
                 break;
             case R.id.action_botom_profile:
                 i = new Intent(this, ProfileActivity.class);
@@ -150,59 +152,57 @@ public class CategoryActivity extends AppCompatActivity implements MyRecyclerVie
         for (int tr = 0; tr<listado.size(); tr++){
             categoryDao.update(listado.get(tr));
         }
+
         final String json = new Gson().toJson(listado);
-        Log.d("Json_Gson", json);
-
-        RequestQueue queue;
-
-        queue = Volley.newRequestQueue(this);
 
         String url ="http://redoff.bithive.cloud/ws/categories_save";
 
-        StringRequest strReq = new StringRequest(
-                Request.Method.POST,
-                url,
+        RequestQueue queue = Volley.newRequestQueue(this);
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.d("respuesta_save", response);
+                        Log.d("Quehay", response);
+                        try {
+                            JSONObject jsonResponse = new JSONObject(response);
+
+                            if (jsonResponse.getString("data").equals("Ok")){
+                                showToastMessage("Guardado");
+                            }else{
+                                showToastMessage("Error!");
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
-                    }
-                })  {
+                }, new Response.ErrorListener() {
             @Override
-            public String getBodyContentType() {
-                return "application/json; charset=utf-8";
+            public void onErrorResponse(VolleyError error) {
+                showToastMessage("That didn't work! -- "+error.toString());
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders()  {
+                // Posting parameters to login url
+                Map<String, String> headers = new HashMap<>();
+                String auth = "Bearer "+user.getToken();
+                headers.put("Authorization", auth);
+                return headers;
             }
 
             @Override
             public byte[] getBody()  {
-                try {
-                    return json == null ? null : json.getBytes("utf-8");
-                } catch (UnsupportedEncodingException uee) {
-                    VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", json, "utf-8");
-                    return null;
-                }
+                return json.toString().getBytes();
             }
 
             @Override
-            protected Response<String> parseNetworkResponse(NetworkResponse response) {
-                String responseString = "";
-                if (response != null) {
-                    responseString = String.valueOf(response.statusCode);
-                    // can get more details such as response.headers
-                }
-                return Response.success(responseString, HttpHeaderParser.parseCacheHeaders(response));
+            public String getBodyContentType() {
+                return "application/json; charset=utf-8";
             }
-
         };
-
-        // Adding request to request queue
-        queue.add(strReq);
+        // Add the request to the RequestQueue.
+        queue.add(stringRequest);
 
         finish();
     }

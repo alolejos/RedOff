@@ -1,10 +1,11 @@
-package com.abcontenidos.www.redhost;
+package com.abcontenidos.www.redhost.Dbases;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
-import android.util.Log;
+
+import com.abcontenidos.www.redhost.Objets.Post;
 
 import java.util.ArrayList;
 
@@ -24,8 +25,8 @@ public class PostDao {
     {
         Cursor c;
         Post post = null;
-        c = db.rawQuery("SELECT id, name, details, category, image" +
-                " FROM posts WHERE 1",null);
+        c = db.rawQuery("SELECT id, name, details, category, image, commerce" +
+                " FROM posts WHERE id="+id,null);
 
         if(c.moveToFirst())
         {
@@ -35,6 +36,7 @@ public class PostDao {
             post.setDetails(c.getString(2));
             post.setCategory(c.getString(3));
             post.setImage(c.getString(4));
+            post.setCommerce(c.getString(5));
         }
         c.close();
         return post;
@@ -55,6 +57,7 @@ public class PostDao {
                 post.setDetails(c.getString(2));
                 post.setCategory(c.getString(3));
                 post.setImage(c.getString(4));
+                post.setCommerce(c.getString(5));
                 list.add(post);
             }while (c.moveToNext());
         }
@@ -69,11 +72,12 @@ public class PostDao {
         //statementSave.bindString(2, category.getDetails());
         //return statementSave.executeInsert();
         ContentValues values = new ContentValues();
-        values.put("id", post.getId());
+        //values.put("id", post.getId());
         values.put("name", post.getName());
         values.put("details", post.getDetails());
-        values.put("category", post.getCategory());
         values.put("image", post.getImage());
+        values.put("category", post.getCategory());
+        values.put("commerce", post.getCommerce());
         return  db.insert(tableName, null, values);
     }
 
@@ -85,12 +89,13 @@ public class PostDao {
         values.put("details", post.getDetails());
         values.put("category", post.getCategory());
         values.put("image", post.getImage());
+        values.put("commerce", post.getCommerce());
         db.update("posts", values, "id="+post.getId(), null);
     }
 
-    public void delete(Post post)
+    public void delete()
     {
-        db.delete("posts","id="+post.getId(), null);
+        db.delete("posts",null, null);
     }
 
     public void clear()

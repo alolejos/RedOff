@@ -1,4 +1,4 @@
-package com.abcontenidos.www.redhost;
+package com.abcontenidos.www.redhost.Dbases;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -21,6 +21,7 @@ public class MyDbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE categories " + " ("
                 + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "id_database TEXT NOT NULL,"
                 + "name TEXT NOT NULL,"
                 + "details TEXT NOT NULL,"
                 + "selected TEXT NOT NULL DEFAULT 'false',"
@@ -44,6 +45,7 @@ public class MyDbHelper extends SQLiteOpenHelper {
                 + "details TEXT NOT NULL,"
                 + "category TEXT NOT NULL,"
                 + "image TEXT NOT NULL,"
+                + "commerce TEXT NOT NULL,"
                 + "UNIQUE (id))");
 
     }

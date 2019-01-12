@@ -1,11 +1,8 @@
-package com.abcontenidos.www.redhost;
+package com.abcontenidos.www.redhost.Activities;
 
-import android.Manifest;
 import android.app.DatePickerDialog;
-import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -13,11 +10,10 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.TextInputLayout;
-import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.telephony.TelephonyManager;
 import android.util.Base64;
 import android.util.Log;
 import android.util.Patterns;
@@ -33,6 +29,10 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.abcontenidos.www.redhost.DatePickerFragment;
+import com.abcontenidos.www.redhost.Objets.User;
+import com.abcontenidos.www.redhost.R;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -41,16 +41,11 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
@@ -64,7 +59,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     String mCurrentPhotoPath;
     File photoFile;
     Boolean flag_take_picture = false;
-    TextInputLayout tilName, tilMail, tilPass, tilRePass, tilAddress;
+    TextInputLayout tilName, tilMail, tilPass, tilRePass, tilAddress, tilBirthday;
     ProgressBar progressBar;
 
 
@@ -91,6 +86,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         tilPass = findViewById(R.id.tilPass);
         tilRePass = findViewById(R.id.tilRePass);
         tilAddress = findViewById(R.id.tilAddress);
+        tilBirthday = findViewById(R.id.tilBirthday);
+
 
         progressBar = findViewById(R.id.progressBar);
 
@@ -111,62 +108,90 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         switch (v.getId()){
             case R.id.save_register:
                 // PRIMERO VALIDAR LOS DATOS
-                validarDatos();
-                User user = new User();
-                user.setPass(pass.getText().toString());
-                user.setGender(spinner.getSelectedItem().toString());
-                user.setBirthday(birthday.getText().toString());
-                user.setAddress(address.getText().toString());
-                user.setMail(mail.getText().toString());
-                user.setName(name.getText().toString());
+                if(validarDatos()) {
+                    User user = new User();
+                    user.setPass(pass.getText().toString());
+                    user.setGender(spinner.getSelectedItem().toString());
+                    user.setBirthday(birthday.getText().toString());
+                    user.setAddress(address.getText().toString());
+                    user.setMail(mail.getText().toString());
+                    user.setName(name.getText().toString());
 
-                Bitmap bm = ((BitmapDrawable)imageProfile.getDrawable()).getBitmap();
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                bm.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-                byte[] encodedString = byteArrayOutputStream.toByteArray();
-                String toBase64 = Base64.encodeToString(encodedString, Base64.DEFAULT);
-                user.setImage(toBase64);
+                    Bitmap bm = ((BitmapDrawable) imageProfile.getDrawable()).getBitmap();
+                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                    bm.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+                    byte[] encodedString = byteArrayOutputStream.toByteArray();
+                    String toBase64 = Base64.encodeToString(encodedString, Base64.DEFAULT);
+                    user.setImage(toBase64);
 
-                Gson gson = new Gson();
-                final String json = gson.toJson(user);
-                RequestQueue queue = Volley.newRequestQueue(this);
-                String url ="http://redoff.bithive.cloud/ws/register";
-                StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-                                Log.d("registrando", response);
+                    Gson gson = new Gson();
+                    final String json = gson.toJson(user);
+                    RequestQueue queue = Volley.newRequestQueue(this);
+                    String url = "http://redoff.bithive.cloud/ws/register";
+
+                    StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                            new Response.Listener<String>() {
+                                @Override
+                                public void onResponse(String response) {
+                                    Log.d("registrando", response);
                                     if (response.equals("Ok")) {
-                                        showToastMessage("Ahora ingrese a su mail para activar la cuenta");
                                         progressBar.setVisibility(View.GONE);
-                                        finish();
-                                    }else{
-                                        showToastMessage("Error en la creacion de cuenta");
+                                        AlertDialog alertDialog = new AlertDialog.Builder(RegisterActivity.this).create();
+                                        alertDialog.setCanceledOnTouchOutside(false);
+                                        //alertDialog.onTouchEvent();
+                                        alertDialog.setTitle("Usuario creado");
+                                        alertDialog.setMessage("Ingrese a su cuenta de correo para activar el usuario");
+                                        alertDialog.setIcon(R.drawable.ic_launcher_background);
+
+                                        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                finish();
+                                            }
+                                        });
+
+                                        alertDialog.show();
+                                    } else {
                                         progressBar.setVisibility(View.GONE);
-                                        finish();
+                                        AlertDialog alertDialog = new AlertDialog.Builder(getApplicationContext()).create();
+                                        alertDialog.setTitle("Hubo un error en la creacion del usuario");
+                                        alertDialog.setMessage("Reintente crear el usuario");
+                                        alertDialog.setIcon(R.drawable.ic_launcher_background);
+
+                                        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                finish();
+                                            }
+                                        });
+
+                                        alertDialog.show();
                                     }
-                            }
-                        }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        showToastMessage("That didn't work! -- "+error.toString());
-                    }
-                }) {
-                    @Override
-                    public byte[] getBody()  {
-                        return json.toString().getBytes();
-                    }
+                                }
+                            }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            showToastMessage("That didn't work! -- " + error.toString());
+                        }
+                    }) {
+                        @Override
+                        public byte[] getBody() {
+                            return json.toString().getBytes();
+                        }
 
-                    @Override
-                    public String getBodyContentType() {
-                        return "application/json; charset=utf-8";
-                    }
-                };
-                // Add the request to the RequestQueue.
-                queue.add(stringRequest);
-                progressBar.setVisibility(View.VISIBLE);
+                        @Override
+                        public String getBodyContentType() {
+                            return "application/json; charset=utf-8";
+                        }
+                    };
+                    stringRequest.setRetryPolicy(new DefaultRetryPolicy(0,
+                            DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+                    // Add the request to the RequestQueue.
+                    queue.add(stringRequest);
+                    progressBar.setVisibility(View.VISIBLE);
+                    buttonRegister.setEnabled(false);
+                }
                 break;
-
             case R.id.et_register_birthday:
                 showDatePickerDialog(birthday);
                 break;
@@ -338,20 +363,33 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         return true;
     }
 
-    private void validarDatos() {
+    private boolean esFechaValida(String fecha) {
+        if (fecha.equals("")) {
+            tilBirthday.setError("Ingrese una fecha");
+            return false;
+        } else {
+            tilBirthday.setError(null);
+        }
+
+        return true;
+    }
+
+    private boolean validarDatos() {
         String nombre = tilName.getEditText().getText().toString();
         String pass = tilRePass.getEditText().getText().toString();
         String correo = tilMail.getEditText().getText().toString();
 
+        String fecha = birthday.getText().toString();
+
         boolean a = esNombreValido(nombre);
         boolean b = esPassValido(pass);
         boolean c = esCorreoValido(correo);
+        boolean d = esFechaValida(fecha);
 
-        if (a && b && c) {
-            // OK, se pasa a la siguiente acción
-            //Toast.makeText(this, "Se guarda el registro", Toast.LENGTH_LONG).show();
+        if (a && b && c && d) {
+            return true;
         }else {
-            Toast.makeText(this, "Todo mal... hay que ingresar todo de vuelta", Toast.LENGTH_LONG).show();
+            return false;
         }
 
     }

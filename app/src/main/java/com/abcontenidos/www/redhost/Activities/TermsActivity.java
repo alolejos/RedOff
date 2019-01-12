@@ -1,7 +1,9 @@
-package com.abcontenidos.www.redhost;
+package com.abcontenidos.www.redhost.Activities;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import com.abcontenidos.www.redhost.R;
 
 public class TermsActivity extends AppCompatActivity {
 

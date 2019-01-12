@@ -1,4 +1,4 @@
-package com.abcontenidos.www.redhost;
+package com.abcontenidos.www.redhost.Objets;
 
 public class Category {
     String name, details, image, selected;

@@ -6,9 +6,9 @@
         android:icon="@android:drawable/ic_menu_gallery"
         android:title="Promos" />
     <item
-        android:id="@+id/action_botom_favorites"
+        android:id="@+id/action_botom_categories"
         android:icon="@mipmap/baseline_list_white_24"
-        android:title="Favoritos"/>
+        android:title="Categorías"/>
     <item
         android:id="@+id/action_botom_profile"
         android:icon="@mipmap/person"

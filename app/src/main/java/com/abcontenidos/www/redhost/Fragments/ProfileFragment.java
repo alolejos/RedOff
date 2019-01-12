@@ -1,23 +1,26 @@
-package com.abcontenidos.www.redhost;
+package com.abcontenidos.www.redhost.Fragments;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
+import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.Fragment;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -27,6 +30,11 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.abcontenidos.www.redhost.DatePickerFragment;
+import com.abcontenidos.www.redhost.Dbases.MyDbHelper;
+import com.abcontenidos.www.redhost.R;
+import com.abcontenidos.www.redhost.Objets.User;
+import com.abcontenidos.www.redhost.Dbases.UserDao;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -47,9 +55,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ProfileActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
+public class ProfileFragment extends Fragment implements View.OnClickListener, AdapterView.OnItemSelectedListener{
 
-    Toolbar myToolbar;
+    private static final String ARG_PARAM1 = "param1";
+    private static final String ARG_PARAM2 = "param2";
     EditText name, mail, address, birthday;
     Spinner spinner;
     ImageView imageProfile;
@@ -59,27 +68,59 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     File photoFile;
     Boolean flag_take_picture = false;
     User user;
+    BottomNavigationView bottomNavigationView;
+
+    // TODO: Rename and change types of parameters
+    private String mParam1;
+    private String mParam2;
+
+    public ProfileFragment() {
+        // Required empty public constructor
+    }
+
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @param param1 Parameter 1.
+     * @param param2 Parameter 2.
+     * @return A new instance of fragment ProfileFragment.
+     */
+    // TODO: Rename and change types and number of parameters
+    public static ProfileFragment newInstance(String param1, String param2) {
+        ProfileFragment fragment = new ProfileFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_PARAM1, param1);
+        args.putString(ARG_PARAM2, param2);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_profile);
+        if (getArguments() != null) {
+            mParam1 = getArguments().getString(ARG_PARAM1);
+            mParam2 = getArguments().getString(ARG_PARAM2);
+        }
+    }
 
-        // Seteo de la Toolbar
-        myToolbar = (Toolbar) findViewById(R.id.my_toolbar_profile);
-        setSupportActionBar(myToolbar);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
-        // Seteo de las Views
-        name = findViewById(R.id.et_profile_name);
-        mail = findViewById(R.id.et_profile_mail);
-        address = findViewById(R.id.et_profile_address);
-        birthday = findViewById(R.id.et_birthday);
-        imageProfile = findViewById(R.id.image_profile);
-        saveProfile = findViewById(R.id.save_profile);
-        spinner = findViewById(R.id.et_gender);
+        saveProfile = view.findViewById(R.id.save_profile);
+        name = view.findViewById(R.id.et_profile_name);
+        mail = view.findViewById(R.id.et_profile_mail);
+        address = view.findViewById(R.id.et_profile_address);
+        birthday = view.findViewById(R.id.et_birthday);
+        imageProfile = view.findViewById(R.id.image_profile);
+        spinner = view.findViewById(R.id.et_gender);
 
         // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource (this,
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource (getActivity(),
                 R.array.gender_array, android.R.layout.simple_spinner_item);
         // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -93,7 +134,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         spinner.setOnItemSelectedListener(this);
 
         // Carga los datos del usuario de la Base de dato a un User
-        MyDbHelper helper = new MyDbHelper(this, "user");
+        MyDbHelper helper = new MyDbHelper(getActivity(), "user");
         SQLiteDatabase db = helper.getWritableDatabase();
         UserDao userDao = new UserDao(db);
         user = userDao.get();
@@ -111,75 +152,55 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         }
 
         // Pase de datos a los objetos visuales
-        name.setText(user.name);
-        mail.setText(user.mail);
-        address.setText(user.address);
-        birthday.setText(inputTimeStamp);
-        int spinnerPosition = adapter.getPosition(user.gender);
+        byte[] decodedString = Base64.decode(user.getImage(), Base64.DEFAULT);
+        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+        imageProfile.setImageBitmap(decodedByte);
+        name.setText(user.getName());
+        mail.setText(user.getMail());
+        address.setText(user.getAddress());
+        //birthday.setText(inputTimeStamp);
+        int spinnerPosition = adapter.getPosition(user.getGender());
         spinner.setSelection(spinnerPosition);
         //gender.setText(user.age);
 
-        byte[] decodedString = Base64.decode(user.image, Base64.DEFAULT);
-        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-
-        imageProfile.setImageBitmap(decodedByte);
-
-
+        return view;
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_profile, menu);
-        return true;
+    public void onAttach(Context context) {
+        super.onAttach(context);
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_terminos:
-                Intent i = new Intent(this, TermsActivity.class);
-                startActivity(i);
-                break;
-            case R.id.action_acerca:
-                showToastMessage("Red Off es una aplicacion bla bla bla bla \n Desarrollado por Abcontenidos.com");
-                break;
-            default:
-                break;
+    public void onDetach() {
+        super.onDetach();
+    }
+
+    private void dispatchTakePictureIntent() {
+        Fragment yourFragment = this;
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        photoFile = null;
+        try {
+            photoFile = createImageFile();
+        } catch (IOException ex) {
+            // Error occurred while creating the File
         }
-
-        return true;
-    }
-
-    private void showToastMessage (String message) {
-        Toast toast = Toast.makeText(this, message, Toast.LENGTH_LONG);
-        toast.setGravity(Gravity.CENTER, 0, 0);
-        toast.show();
+        // Continue only if the File was successfully created
+        if (photoFile !=    null) {
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
+        }
+        yourFragment.startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.image_profile:
-                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                // Ensure that there's a camera activity to handle the intent
-                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                    // Create the File where the photo should go
-                    photoFile = null;
-                    try {
-                        photoFile = createImageFile();
-                    } catch (IOException ex) {
-                        // Error occurred while creating the File
-                    }
-                    // Continue only if the File was successfully created
-                    if (photoFile != null) {
-                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
-                        startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
-                    }
-                }
+                dispatchTakePictureIntent();
                 break;
 
             case R.id.save_profile:
+
                 String birthdayString = null;
                 // formatear la fecha
                 try {
@@ -193,7 +214,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                 }
 
                 // Base de datos
-                MyDbHelper helper = new MyDbHelper(this, "user");
+                MyDbHelper helper = new MyDbHelper(getActivity(), "user");
                 SQLiteDatabase db = helper.getWritableDatabase();
                 UserDao userDao = new UserDao(db);
 
@@ -214,7 +235,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
                 Gson gson = new Gson();
                 final String json = gson.toJson(user);
-                RequestQueue queue = Volley.newRequestQueue(this);
+                RequestQueue queue = Volley.newRequestQueue(getActivity());
                 String url ="http://redoff.bithive.cloud/ws/profile";
                 StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                         new Response.Listener<String>() {
@@ -260,7 +281,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                 };
                 // Add the request to the RequestQueue.
                 queue.add(stringRequest);
-                finish();
                 break;
 
             case R.id.et_birthday:
@@ -270,33 +290,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     }
 
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "MAG_JPEG_" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-
-        // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = image.getAbsolutePath();
-        return image;
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode,
-                                    Intent data) {
-        if (requestCode == REQUEST_TAKE_PHOTO) {
-            //imageProfile.setImageBitmap(mImageBitmap);
-            //imageProfile.setImageURI(Uri.parse(mCurrentPhotoPath));
-            //Picasso.get().load(mCurrentPhotoPath).into(imageProfile);
-            flag_take_picture = true;
-            setPic();
-        }
-    }
 
     private void setPic() {
         // Get the dimensions of the View
@@ -376,7 +369,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                 editText.setText(selectedDate);
             }
         });
-        newFragment.show(getSupportFragmentManager(), "datePicker");
+        newFragment.show(getFragmentManager(), "datePicker");
     }
 
     private String twoDigits(int n) {
@@ -384,7 +377,47 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private static String TimeStampConverter(final String inputFormat, String inputTimeStamp, final String outputFormat) throws ParseException {
-            return new SimpleDateFormat(outputFormat).format(new SimpleDateFormat(inputFormat).parse(inputTimeStamp));
+        return new SimpleDateFormat(outputFormat).format(new SimpleDateFormat(inputFormat).parse(inputTimeStamp));
     }
-}
+    private void showToastMessage (String message) {
+        Toast toast = Toast.makeText(getActivity(), message, Toast.LENGTH_LONG);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
+    }
 
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "MAG_JPEG_" + timeStamp + "_";
+        File storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case 1:
+                if (resultCode == Activity.RESULT_OK) {
+                    //Do something with your captured image. EX:-
+                    Uri selectedImage = data.getData();
+                    String[] filePathColumn = { MediaStore.Images.Media.DATA };
+                    Cursor cursor = getActivity().getContentResolver().query(selectedImage,
+                            filePathColumn, null, null, null);
+                    cursor.moveToFirst();
+                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                    String picturePath = cursor.getString(columnIndex);
+                    cursor.close();
+                    imageProfile.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+                }
+        }
+    }
+
+}

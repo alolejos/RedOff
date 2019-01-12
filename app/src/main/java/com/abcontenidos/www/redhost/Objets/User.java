@@ -1,8 +1,16 @@
-package com.abcontenidos.www.redhost;
+package com.abcontenidos.www.redhost.Objets;
 
 
 public class User {
-    String id, name, mail, token, address, gender, birthday, image, pass;
+    String id;
+    public String name;
+    String mail;
+    String token;
+    String address;
+    String gender;
+    String birthday;
+    String image;
+    String pass;
 
     public String getPass() {
         return pass;

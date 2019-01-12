@@ -4,10 +4,10 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-    <uses-feature android:name="android.hardware.camera"
+    <uses-feature
+        android:name="android.hardware.camera"
         android:required="true" />
 
     <application
@@ -18,7 +18,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         <activity
-            android:name=".SplashActivity"
+            android:name=".Activities.SplashActivity"
             android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,24 +26,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".ForgotActivity" />
-        <activity android:name=".RegisterActivity" />
-        <activity android:name=".MainActivity" />
-        <activity android:name=".CategoryActivity" />
-        <activity android:name=".TermsActivity" />
-        <activity android:name=".ProfileActivity"></activity>
-
-        <provider
-            android:name="android.support.v4.content.FileProvider"
-            android:authorities="com.abcontenidos.www.redhost.fileprovider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"></meta-data>
-        </provider>
-
+        <activity android:name=".Activities.LoginActivity" />
+        <activity android:name=".Activities.ForgotActivity" />
+        <activity android:name=".Activities.RegisterActivity" />
+        <activity android:name=".Activities.MainActivity" />
+        <activity android:name=".Activities.CategoryActivity" />
+        <activity android:name=".Activities.TermsActivity" />
+        <activity android:name=".Activities.ProfileActivity" />
+        <activity android:name=".PostInfo" />
+        <activity android:name=".Activities.PrincipalActivity" />
     </application>
 
 </manifest>

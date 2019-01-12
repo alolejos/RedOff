@@ -1,10 +1,8 @@
-package com.abcontenidos.www.redhost;
+package com.abcontenidos.www.redhost.Activities;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.BitmapFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -19,25 +17,28 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
+import com.abcontenidos.www.redhost.Dbases.CategoryDao;
+import com.abcontenidos.www.redhost.Dbases.MyDbHelper;
+import com.abcontenidos.www.redhost.Objets.Category;
+import com.abcontenidos.www.redhost.Objets.Post;
+import com.abcontenidos.www.redhost.Objets.User;
+import com.abcontenidos.www.redhost.Dbases.PostDao;
+import com.abcontenidos.www.redhost.R;
+import com.abcontenidos.www.redhost.Dbases.UserDao;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import okio.Utf8;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -47,7 +48,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     TextView registerText, forgotText;
     Button loginButton;
     Intent intent;
-    SharedPreferences sp;
     Context context;
 
     @Override
@@ -56,24 +56,22 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        Toolbar myToolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
 
-        nameText = (EditText)findViewById(R.id.userText);
-        passwordText = (EditText)findViewById(R.id.passwordText);
-        registerText = (TextView) findViewById(R.id.registerText);
-        forgotText = (TextView) findViewById(R.id.forgotText);
-        loginButton = (Button)findViewById(R.id.loginButton);
-        image = (ImageView)findViewById(R.id.loginImage);
-        aSwitch = (Switch)findViewById(R.id.switch1);
+        nameText = findViewById(R.id.userText);
+        passwordText = findViewById(R.id.passwordText);
+        registerText = findViewById(R.id.registerText);
+        forgotText = findViewById(R.id.forgotText);
+        loginButton = findViewById(R.id.loginButton);
+        image = findViewById(R.id.loginImage);
+        aSwitch = findViewById(R.id.switch1);
 
         context = getApplicationContext();
 
         loginButton.setOnClickListener(this);
         registerText.setOnClickListener(this);
         forgotText.setOnClickListener(this);
-
-        sp = getSharedPreferences("Login", MODE_PRIVATE);
 
     }
 
@@ -95,7 +93,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                 new Response.Listener<String>() {
                                     @Override
                                     public void onResponse(String response) {
-                                        Log.d("respuesta", response);
+                                        Log.d("logiactivity", response);
                                         MyDbHelper helper = new MyDbHelper(context, "user");
                                         SQLiteDatabase db = helper.getWritableDatabase();
                                         UserDao userDao = new UserDao(db);
@@ -120,8 +118,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                                 user.setBirthday(listado.getString("birthday"));
                                                 user.setImage(listado.getString("image"));
                                                 userDao.save(user);
+
+                                                JSONArray posteos = data.getJSONArray("posts");
+                                                save_posteos(posteos);
+
+                                                JSONArray categories = data.getJSONArray("categories");
+                                                save_categories(categories);
+
                                                 Intent i = new Intent(LoginActivity.this, MainActivity.class);
-                                                i.putExtra("key", response);
+                                                //i.putExtra("key", response);
                                                 startActivity(i);
                                             }
                                         } catch (JSONException e) {
@@ -193,9 +198,56 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
+    private void save_categories(JSONArray categories) {
+        Category category = new Category();
+        MyDbHelper helperCategories = new MyDbHelper(this, "categories");
+        SQLiteDatabase db_categories = helperCategories.getWritableDatabase();
+        CategoryDao categoryDao = new CategoryDao(db_categories);
+        db_categories.execSQL("delete from categories");
+        for (int i = 0; i < categories.length(); i++){
+            JSONObject jsonObj = null;
+            try {
+                jsonObj = categories.getJSONObject(i);
+                category.setId(jsonObj.getInt("id"));
+                category.setName(jsonObj.getString("name"));
+                category.setDetails(jsonObj.getString("details"));
+                category.setImage("http://redoff.bithive.cloud/files/categories/thumbs/"+jsonObj.getString("image"));
+                category.setSelected(jsonObj.getString("selected"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Log.d("problema", e.toString());
+            }
+            categoryDao.save(category);
+        }
+    }
+
+    private void save_posteos(JSONArray posteos) {
+        Post post = new Post();
+        MyDbHelper helperPosts = new MyDbHelper(this, "posts");
+        SQLiteDatabase db_posts = helperPosts.getWritableDatabase();
+        PostDao postsDao = new PostDao(db_posts);
+        db_posts.execSQL("delete from posts");
+        for (int i = 0; i < posteos.length(); i++){
+            JSONObject jsonObj = null;
+            try {
+                jsonObj = posteos.getJSONObject(i);
+                post.setName(jsonObj.getString("name"));
+                post.setDetails(jsonObj.getString("details"));
+                post.setImage(jsonObj.getString("image"));
+                post.setCategory(jsonObj.getString("category"));
+                post.setCommerce(jsonObj.getString("commerce"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Log.d("problema", e.toString());
+                }
+            postsDao.save(post);
+        }
+    }
+
     private void showToastMessage (String message) {
         Toast toast = Toast.makeText(this, message, Toast.LENGTH_LONG);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
     }
+
 }

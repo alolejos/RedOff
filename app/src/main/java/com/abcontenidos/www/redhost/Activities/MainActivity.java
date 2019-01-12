@@ -1,8 +1,8 @@
-package com.abcontenidos.www.redhost;
+package com.abcontenidos.www.redhost.Activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.BitmapFactory;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,6 +16,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.abcontenidos.www.redhost.Dbases.MyDbHelper;
+import com.abcontenidos.www.redhost.MyRecyclerViewAdapter;
+import com.abcontenidos.www.redhost.Objets.Post;
+import com.abcontenidos.www.redhost.Objets.User;
+import com.abcontenidos.www.redhost.Dbases.PostDao;
+import com.abcontenidos.www.redhost.PostInfo;
+import com.abcontenidos.www.redhost.R;
+import com.abcontenidos.www.redhost.Dbases.UserDao;
+
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements MyRecyclerViewAdapter.ItemClickListener {
@@ -25,50 +34,43 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     SharedPreferences sp;
     Toolbar myToolbar;
     BottomNavigationView bottomNavigationView;
+    User user;
+    UserDao userDao;
+    PostDao postDao;
+    Integer from, to;
+    ArrayList<Post> list;
+    RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        myToolbar = (Toolbar) findViewById(R.id.my_toolbar_main);
-        bottomNavigationView = (BottomNavigationView) findViewById(R.id.my_toolbar_botom);
+        // carga elementos visuales
+        myToolbar = findViewById(R.id.my_toolbar_main);
+        bottomNavigationView = findViewById(R.id.my_toolbar_botom);
         setSupportActionBar(myToolbar);
 
+        // lectura del usuario de la base de datos
+        MyDbHelper helper = new MyDbHelper(this, "user");
+        SQLiteDatabase db = helper.getWritableDatabase();
+        userDao = new UserDao(db);
+        user = userDao.get();
 
-        Bundle extras = getIntent().getExtras();
-        String token = extras.getString("token");
+        // lectura de los posts
+        MyDbHelper helperPosts = new MyDbHelper(this, "posts");
+        SQLiteDatabase db1 = helperPosts.getWritableDatabase();
+        postDao= new PostDao(db1);
+        list = postDao.getall();
 
-        Promotion a = new Promotion("TV 12'", "TV Samsung 12 pulgadas LCD", "AUDIO y VIDEO", BitmapFactory.decodeResource(getResources(), R.drawable.tvlcd));
-        Promotion b = new Promotion("20% ACEITES'", "20% de descuento en aceites", "ALIMENTOS", BitmapFactory.decodeResource(getResources(), R.drawable.aceite));
-        Promotion c = new Promotion("TV 12'", "TV Samsung 12 pulgadas LCD", "AUDIO y VIDEO", BitmapFactory.decodeResource(getResources(), R.drawable.tvlcd));
-        Promotion d = new Promotion("20% ACEITES'", "20% de descuento en aceites", "ALIMENTOS", BitmapFactory.decodeResource(getResources(), R.drawable.aceite));
-        Promotion e = new Promotion("TV 12'", "TV Samsung 12 pulgadas LCD", "AUDIO y VIDEO", BitmapFactory.decodeResource(getResources(), R.drawable.tvlcd));
-        Promotion f = new Promotion("20% ACEITES'", "20% de descuento en aceites", "ALIMENTOS", BitmapFactory.decodeResource(getResources(), R.drawable.aceite));
-        ArrayList<Promotion> list = new ArrayList<>();
-        list.add(a);
-        list.add(b);
-        list.add(c);
-        list.add(d);
-        list.add(e);
-        list.add(f);
-
-
-        // set up the RecyclerView
-        RecyclerView recyclerView = findViewById(R.id.recycler_main);
+        // carga del Recyclerview
+        recyclerView = findViewById(R.id.recycler_main);
         int numberOfColumns = 3;
         recyclerView.setLayoutManager(new GridLayoutManager(this, numberOfColumns));
         adapter = new MyRecyclerViewAdapter(this, list);
         adapter.setClickListener(this);
         recyclerView.setAdapter(adapter);
 
-        sp = getSharedPreferences("Login", MODE_PRIVATE);
-    }
-
-    @Override
-    public void onItemClick(View view, int position) {
-        Log.d("view", Integer.toString(view.getId()));
-        Log.d("Position", Integer.toString(position));
     }
 
     @Override
@@ -101,15 +103,14 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
             showToastMessage("Red Off es una aplicacion bla bla bla bla \n Desarrollado por Abcontenidos.com");
                 break;
             case R.id.action_logout:
-                SharedPreferences.Editor ed = sp.edit();
-                ed.clear();
-                ed.apply();
+                userDao.delete();
+                postDao.delete();
                 i = new Intent(this, LoginActivity.class);
                 startActivity(i);
                 break;
             case R.id.action_botom_main:
                 break;
-            case R.id.action_botom_favorites:
+            case R.id.action_botom_categories:
                 i = new Intent(this, CategoryActivity.class);
                 startActivity(i);
                 break;
@@ -128,5 +129,12 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         Toast toast = Toast.makeText(this, message, Toast.LENGTH_LONG);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
+    }
+
+    @Override
+    public void onItemClick(View view, int position) {
+        i = new Intent(this, PostInfo.class);
+        i.putExtra("key", position);
+        startActivity(i);
     }
 }

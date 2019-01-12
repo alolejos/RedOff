@@ -3,7 +3,6 @@ package com.abcontenidos.www.redhost;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.abcontenidos.www.redhost.Objets.Category;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ public class MyRecyclerViewAdapterCategories extends RecyclerView.Adapter<MyRecy
     private Context context;
 
     // data is passed into the constructor
-    MyRecyclerViewAdapterCategories(Context context, ArrayList<Category> data) {
+    public MyRecyclerViewAdapterCategories(Context context, ArrayList<Category> data) {
         this.context = context;
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
@@ -78,9 +78,7 @@ public class MyRecyclerViewAdapterCategories extends RecyclerView.Adapter<MyRecy
 
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            Log.d("vaca", mData.get(getAdapterPosition()).getSelected().toString());
             mData.get(getAdapterPosition()).setSelected(Boolean.toString(isChecked));
-            Log.d("vaca1", mData.get(getAdapterPosition()).getSelected().toString());
 
         }
     }
@@ -91,7 +89,7 @@ public class MyRecyclerViewAdapterCategories extends RecyclerView.Adapter<MyRecy
     }
 
     // allows clicks events to be caught
-    void setClickListener(ItemClickListener itemClickListener) {
+    public void setClickListener(ItemClickListener itemClickListener) {
         this.mClickListener = itemClickListener;
     }
 

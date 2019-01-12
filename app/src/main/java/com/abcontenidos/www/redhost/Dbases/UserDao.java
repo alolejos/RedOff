@@ -1,10 +1,12 @@
-package com.abcontenidos.www.redhost;
+package com.abcontenidos.www.redhost.Dbases;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
+
+import com.abcontenidos.www.redhost.Objets.User;
 
 import java.util.ArrayList;
 
@@ -75,7 +77,7 @@ public class UserDao {
         //statementSave.bindString(1, category.getName());
         //statementSave.bindString(2, category.getDetails());
         //return statementSave.executeInsert();
-        Log.d("User_dentro", "address:  "+user.address);
+        Log.d("User_dentro", "address:  "+user.getAddress());
         ContentValues values = new ContentValues();
         values.put("id_base", user.getId());
         values.put("name", user.getName());
@@ -102,9 +104,9 @@ public class UserDao {
         db.update("user", values, "id="+user.getId(), null);
     }
 
-    public void delete(User user)
+    public void delete()
     {
-        db.delete("user","_id="+user.getId(), null);
+        db.delete("user",null, null);
     }
 
     public void clear()

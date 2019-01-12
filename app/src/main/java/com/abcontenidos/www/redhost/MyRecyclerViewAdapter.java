@@ -9,17 +9,19 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.abcontenidos.www.redhost.Objets.Post;
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
-import java.util.List;
 
 public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.ViewHolder> {
 
-    private ArrayList<Promotion> mData;
+    private ArrayList<Post> mData;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
 
     // data is passed into the constructor
-    MyRecyclerViewAdapter(Context context, ArrayList<Promotion> data) {
+    public MyRecyclerViewAdapter(Context context, ArrayList<Post> data) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
     }
@@ -35,9 +37,10 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     // binds the data to the TextView in each cell
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        String image = "http://redoff.bithive.cloud/files/posts/thumbs/"+mData.get(position).getImage();
         holder.textName.setText(mData.get(position).getName());
-        holder.textDetails.setText(mData.get(position).getDetails());
-        holder.imagePromo.setImageBitmap(mData.get(position).getThumbail());
+        holder.textDetails.setText(mData.get(position).getCommerce());
+        Picasso.get().load(image).resize(120, 120).into(holder.imagePromo);
     }
 
     // total number of cells
@@ -57,7 +60,6 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
             textName= itemView.findViewById(R.id.textName);
             textDetails = itemView.findViewById(R.id.textDetails);
             imagePromo = itemView.findViewById(R.id.imagePromo);
-
             itemView.setOnClickListener(this);
         }
 
@@ -68,12 +70,12 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     }
 
     // convenience method for getting data at click position
-    Promotion getItem(int id) {
+    Post getItem(int id) {
         return mData.get(id);
     }
 
     // allows clicks events to be caught
-    void setClickListener(ItemClickListener itemClickListener) {
+    public void setClickListener(ItemClickListener itemClickListener) {
         this.mClickListener = itemClickListener;
     }
 

@@ -1,10 +1,11 @@
-package com.abcontenidos.www.redhost;
+package com.abcontenidos.www.redhost.Dbases;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
-import android.util.Log;
+
+import com.abcontenidos.www.redhost.Objets.Category;
 
 import java.util.ArrayList;
 
@@ -24,7 +25,7 @@ public class CategoryDao {
     {
         Cursor c;
         Category category = null;
-        c = db.rawQuery("SELECT id,nombre,edad" +
+        c = db.rawQuery("SELECT id_database,nombre,edad" +
                 " FROM personas WHERE id=" +id,null);
 
         if(c.moveToFirst())
@@ -45,7 +46,7 @@ public class CategoryDao {
         Cursor c;
         ArrayList<Category> list = new ArrayList<>();
         Category category = null;
-        c = db.rawQuery("SELECT * FROM categories WHERE 1",null);
+        c = db.rawQuery("SELECT id_database, name, details, selected, image FROM categories WHERE 1",null);
 
         if(c.moveToFirst())
         {
@@ -70,7 +71,7 @@ public class CategoryDao {
         //statementSave.bindString(2, category.getDetails());
         //return statementSave.executeInsert();
         ContentValues values = new ContentValues();
-        values.put("id", category.getId());
+        values.put("id_database", category.getId());
         values.put("name", category.getName());
         values.put("details", category.getDetails());
         values.put("image", category.getImage());
@@ -81,7 +82,7 @@ public class CategoryDao {
     public void update(Category category)
     {
         ContentValues values = new ContentValues();
-        values.put("id", category.getId());
+        values.put("id_database", category.getId());
         values.put("name", category.getName());
         values.put("details", category.getDetails());
         values.put("image", category.getImage());
