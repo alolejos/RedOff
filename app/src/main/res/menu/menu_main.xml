@@ -9,6 +9,13 @@
         app:actionViewClass="android.widget.SearchView">
     </item>
     <item
+        android:id="@+id/action_grid"
+        android:icon="@android:drawable/btn_star_big_on"
+        app:showAsAction="ifRoom|withText"
+        android:title="Términos y condiciones">
+
+    </item>
+    <item
         android:id="@+id/action_terminos"
         android:icon="@android:drawable/btn_star"
         android:title="Términos y condiciones">

@@ -5,9 +5,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -24,11 +26,6 @@ import com.abcontenidos.www.redhost.Dbases.UserDao;
 import java.util.ArrayList;
 
 public class PostsFragment extends Fragment implements MyRecyclerViewAdapter.ItemClickListener {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
 
     MyRecyclerViewAdapter adapter;
     Intent i;
@@ -38,30 +35,18 @@ public class PostsFragment extends Fragment implements MyRecyclerViewAdapter.Ite
     ArrayList<Post> list;
     RecyclerView recyclerView;
     TextView texto;
-    private String mParam1;
-    private String mParam2;
 
     public PostsFragment() {
         // Required empty public constructor
     }
 
 
-    public static PostsFragment newInstance(String param1, String param2) {
-        PostsFragment fragment = new PostsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -92,9 +77,11 @@ public class PostsFragment extends Fragment implements MyRecyclerViewAdapter.Ite
         }
 
         // carga del Recyclerview
+
         recyclerView = view.findViewById(R.id.recycler_main);
-        int numberOfColumns = 3;
-        recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), numberOfColumns));
+        int numberColumnsGrid = 3;
+        int numberOfcolumnsList = 1;
+        recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), numberColumnsGrid));
         adapter = new MyRecyclerViewAdapter(getActivity(), list);
         adapter.setClickListener(this);
         recyclerView.setAdapter(adapter);
@@ -113,6 +100,21 @@ public class PostsFragment extends Fragment implements MyRecyclerViewAdapter.Ite
         i.putExtra("key", Integer.valueOf(list.get(position).getId()));
         Log.d("key", list.get(position).getId());
         startActivity(i);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.action_grid:
+
+
+
+                Log.d("grideando", "grid");
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
 }
