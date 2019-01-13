@@ -12,7 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.abcontenidos.www.redhost.Dbases.MyDbHelper;
-import com.abcontenidos.www.redhost.MyRecyclerViewAdapter;
+import com.abcontenidos.www.redhost.Recyclers.MyRecyclerViewAdapter;
 import com.abcontenidos.www.redhost.Objets.Post;
 import com.abcontenidos.www.redhost.Dbases.PostDao;
 import com.abcontenidos.www.redhost.Activities.PostInfo;
@@ -81,6 +81,8 @@ public class PostsFragment extends Fragment implements MyRecyclerViewAdapter.Ite
         SQLiteDatabase db1 = helperPosts.getWritableDatabase();
         postDao= new PostDao(db1);
         list = postDao.getall();
+        db.close();
+        db1.close();
 
         // carga del Recyclerview
         recyclerView = view.findViewById(R.id.recycler_main);

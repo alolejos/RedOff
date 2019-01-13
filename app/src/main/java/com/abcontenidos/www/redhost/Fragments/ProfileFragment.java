@@ -30,7 +30,6 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.abcontenidos.www.redhost.DatePickerFragment;
 import com.abcontenidos.www.redhost.Dbases.MyDbHelper;
 import com.abcontenidos.www.redhost.R;
 import com.abcontenidos.www.redhost.Objets.User;

@@ -132,6 +132,8 @@ public class SplashActivity extends AppCompatActivity {
                 post.setImage(jsonObj.getString("image"));
                 post.setCategory(jsonObj.getString("category"));
                 post.setCommerce(jsonObj.getString("commerce"));
+                post.setAddresscommece(jsonObj.getString("address"));
+                post.setCelcommerce(jsonObj.getString("phone"));
             } catch (JSONException e) {
                 e.printStackTrace();
                 Log.d("problema", e.toString());

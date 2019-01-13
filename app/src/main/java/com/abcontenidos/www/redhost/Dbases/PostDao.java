@@ -25,8 +25,18 @@ public class PostDao {
     {
         Cursor c;
         Post post = null;
-        c = db.rawQuery("SELECT id, name, details, category, image, commerce" +
-                " FROM posts WHERE id="+id,null);
+        c = db.rawQuery("" +
+                "SELECT " +
+                    "p.id, " +
+                    "p.name, " +
+                    "p.details, " +
+                    "p.category, " +
+                    "p.image, " +
+                    "p.commerce," +
+                    "p.address," +
+                    "p.phone" +
+                " FROM posts as p " +
+                "WHERE id="+id,null);
 
         if(c.moveToFirst())
         {
@@ -37,6 +47,8 @@ public class PostDao {
             post.setCategory(c.getString(3));
             post.setImage(c.getString(4));
             post.setCommerce(c.getString(5));
+            post.setAddresscommece(c.getString(6));
+            post.setCelcommerce(c.getString(7));
         }
         c.close();
         return post;

@@ -18,7 +18,7 @@ import com.squareup.picasso.Picasso;
 public class PostInfo extends AppCompatActivity {
 
     Post post;
-    TextView name, details, commerce, addresscommerce, celcommerce;
+    TextView name, details, commerce, address, phone;
     ImageView imageView;
 
     @Override
@@ -37,21 +37,19 @@ public class PostInfo extends AppCompatActivity {
 
         post = postDao.get(id);
 
-        Log.d("postid", ": "+id);
-
         name = findViewById(R.id.infoName);
         details = findViewById(R.id.infoDetails);
         commerce = findViewById(R.id.infoCommerce);
-        addresscommerce = findViewById(R.id.infoAddressCommerce);
-        celcommerce = findViewById(R.id.infoTelCommerce);
+        address = findViewById(R.id.infoAddressCommerce);
+        phone = findViewById(R.id.infoTelCommerce);
 
         imageView = findViewById(R.id.imagePost);
 
         name.setText(post.getName());
         details.setText(post.getCategory());
         commerce.setText(post.getCommerce());
-        addresscommerce.setText(post.getCommerce());
-        celcommerce.setText(post.getCommerce());
+        address.setText(post.getAddresscommece());
+        phone.setText(post.getCelcommerce());
         String image = "http://redoff.bithive.cloud/files/posts/"+post.getImage();
         Picasso.get().load(image).resize(400, 400).into(imageView);
 

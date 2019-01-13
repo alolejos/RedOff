@@ -29,7 +29,7 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.abcontenidos.www.redhost.DatePickerFragment;
+import com.abcontenidos.www.redhost.Fragments.DatePickerFragment;
 import com.abcontenidos.www.redhost.Objets.User;
 import com.abcontenidos.www.redhost.R;
 import com.android.volley.DefaultRetryPolicy;

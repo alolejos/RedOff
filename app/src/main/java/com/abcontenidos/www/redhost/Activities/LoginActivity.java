@@ -93,7 +93,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                 new Response.Listener<String>() {
                                     @Override
                                     public void onResponse(String response) {
-                                        Log.d("logiactivity", response);
                                         MyDbHelper helper = new MyDbHelper(context, "user");
                                         SQLiteDatabase db = helper.getWritableDatabase();
                                         UserDao userDao = new UserDao(db);
@@ -124,10 +123,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                                                 JSONArray categories = data.getJSONArray("categories");
                                                 save_categories(categories);
-
-                                                Intent i = new Intent(LoginActivity.this, MainActivity.class);
-                                                //i.putExtra("key", response);
-                                                startActivity(i);
                                             }
                                         } catch (JSONException e) {
                                             e.printStackTrace();
@@ -219,6 +214,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             }
             categoryDao.save(category);
         }
+        Intent i = new Intent(LoginActivity.this, PrincipalActivity.class);
+        //i.putExtra("key", response);
+        startActivity(i);
     }
 
     private void save_posteos(JSONArray posteos) {
@@ -236,8 +234,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 post.setImage(jsonObj.getString("image"));
                 post.setCategory(jsonObj.getString("category"));
                 post.setCommerce(jsonObj.getString("commerce"));
-                post.setCommerce(jsonObj.getString("address"));
-                post.setCommerce(jsonObj.getString("phone"));
+                post.setAddresscommece(jsonObj.getString("address"));
+                post.setCelcommerce(jsonObj.getString("phone"));
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Log.d("problema", e.toString());
