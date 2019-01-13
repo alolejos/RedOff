@@ -117,10 +117,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                                 user.setBirthday(listado.getString("birthday"));
                                                 user.setImage(listado.getString("image"));
                                                 userDao.save(user);
-
                                                 JSONArray posteos = data.getJSONArray("posts");
                                                 save_posteos(posteos);
-
                                                 JSONArray categories = data.getJSONArray("categories");
                                                 save_categories(categories);
                                             }

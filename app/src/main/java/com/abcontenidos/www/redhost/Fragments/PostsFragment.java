@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.abcontenidos.www.redhost.Dbases.MyDbHelper;
 import com.abcontenidos.www.redhost.Recyclers.MyRecyclerViewAdapter;
@@ -36,6 +37,7 @@ public class PostsFragment extends Fragment implements MyRecyclerViewAdapter.Ite
     PostDao postDao;
     ArrayList<Post> list;
     RecyclerView recyclerView;
+    TextView texto;
     private String mParam1;
     private String mParam2;
 
@@ -69,6 +71,7 @@ public class PostsFragment extends Fragment implements MyRecyclerViewAdapter.Ite
         View view = inflater.inflate(R.layout.fragment_posts, container, false);
 
         // carga elementos visuales
+        texto = view.findViewById(R.id.texto);
 
         // lectura del usuario de la base de datos
         MyDbHelper helper = new MyDbHelper(getActivity(), "user");
@@ -84,9 +87,13 @@ public class PostsFragment extends Fragment implements MyRecyclerViewAdapter.Ite
         db.close();
         db1.close();
 
+        if(list.size()!=0){
+            texto.setVisibility(View.INVISIBLE);
+        }
+
         // carga del Recyclerview
         recyclerView = view.findViewById(R.id.recycler_main);
-        int numberOfColumns = 4;
+        int numberOfColumns = 3;
         recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), numberOfColumns));
         adapter = new MyRecyclerViewAdapter(getActivity(), list);
         adapter.setClickListener(this);

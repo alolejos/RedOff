@@ -65,7 +65,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
     static final int REQUEST_TAKE_PHOTO = 1;
     String mCurrentPhotoPath;
     File photoFile;
-    Boolean flag_take_picture = false;
     User user;
     BottomNavigationView bottomNavigationView;
 
@@ -77,15 +76,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ProfileFragment.
-     */
-    // TODO: Rename and change types and number of parameters
+
     public static ProfileFragment newInstance(String param1, String param2) {
         ProfileFragment fragment = new ProfileFragment();
         Bundle args = new Bundle();
@@ -157,7 +148,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
         name.setText(user.getName());
         mail.setText(user.getMail());
         address.setText(user.getAddress());
-        //birthday.setText(inputTimeStamp);
+        birthday.setText(inputTimeStamp);
         int spinnerPosition = adapter.getPosition(user.getGender());
         spinner.setSelection(spinnerPosition);
         //gender.setText(user.age);
@@ -309,13 +300,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
         bmOptions.inJustDecodeBounds = false;
         bmOptions.inSampleSize = scaleFactor;
         bmOptions.inPurgeable = true;
-
         Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-        ByteArrayOutputStream blob = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 0 /* Ignored for PNGs */, blob);
-        byte[] arrayImagen = blob.toByteArray();
-
-        Bitmap bitmap1 = BitmapFactory.decodeByteArray(arrayImagen, 0, arrayImagen.length);
         imageProfile.setImageBitmap(bitmap);
     }
 

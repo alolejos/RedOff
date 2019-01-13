@@ -6,6 +6,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".Fragments.PostsFragment">
 
+    <TextView
+        android:id="@+id/texto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Seleccione las categorías para ver las promociones"
+        android:textAlignment="center"
+        android:textSize="24sp" />
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_main"
         android:layout_width="match_parent"
