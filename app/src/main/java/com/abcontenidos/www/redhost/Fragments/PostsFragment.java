@@ -35,6 +35,7 @@ public class PostsFragment extends Fragment implements MyRecyclerViewAdapter.Ite
     ArrayList<Post> list;
     RecyclerView recyclerView;
     TextView texto;
+    Boolean llave = true;
 
     public PostsFragment() {
         // Required empty public constructor
@@ -80,7 +81,6 @@ public class PostsFragment extends Fragment implements MyRecyclerViewAdapter.Ite
 
         recyclerView = view.findViewById(R.id.recycler_main);
         int numberColumnsGrid = 3;
-        int numberOfcolumnsList = 1;
         recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), numberColumnsGrid));
         adapter = new MyRecyclerViewAdapter(getActivity(), list);
         adapter.setClickListener(this);
@@ -107,9 +107,13 @@ public class PostsFragment extends Fragment implements MyRecyclerViewAdapter.Ite
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.action_grid:
-
-
-
+                if(llave){
+                    llave = false;
+                    recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
+                }else{
+                    llave = true;
+                    recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                }
                 Log.d("grideando", "grid");
                 return true;
             default:

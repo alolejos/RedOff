@@ -44,6 +44,7 @@ import com.google.gson.Gson;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Pattern;
@@ -109,10 +110,21 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             case R.id.save_register:
                 // PRIMERO VALIDAR LOS DATOS
                 if(validarDatos()) {
+                    String birthdayString = null;
+                    // formatear la fecha
+                    try {
+                        final String inputFormat = "dd/MM/yyyy";
+                        final String outputFormat = "yyyy-MM-dd";
+                        birthdayString = TimeStampConverter(inputFormat, birthday.getText().toString(),
+                                outputFormat);
+                    } catch (ParseException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
                     User user = new User();
                     user.setPass(pass.getText().toString());
                     user.setGender(spinner.getSelectedItem().toString());
-                    user.setBirthday(birthday.getText().toString());
+                    user.setBirthday(birthdayString);
                     user.setAddress(address.getText().toString());
                     user.setMail(mail.getText().toString());
                     user.setName(name.getText().toString());
@@ -221,6 +233,10 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
+    }
+
+    private static String TimeStampConverter(final String inputFormat, String inputTimeStamp, final String outputFormat) throws ParseException {
+        return new SimpleDateFormat(outputFormat).format(new SimpleDateFormat(inputFormat).parse(inputTimeStamp));
     }
 
     @Override

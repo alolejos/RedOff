@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,12 +12,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -27,6 +27,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -42,6 +43,8 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 
+import com.squareup.picasso.Picasso;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -56,8 +59,6 @@ import java.util.Map;
 
 public class ProfileFragment extends Fragment implements View.OnClickListener, AdapterView.OnItemSelectedListener{
 
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
     EditText name, mail, address, birthday;
     Spinner spinner;
     ImageView imageProfile;
@@ -66,33 +67,17 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
     String mCurrentPhotoPath;
     File photoFile;
     User user;
-    BottomNavigationView bottomNavigationView;
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    ProgressBar progressBar;
 
     public ProfileFragment() {
         // Required empty public constructor
     }
 
 
-    public static ProfileFragment newInstance(String param1, String param2) {
-        ProfileFragment fragment = new ProfileFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -108,6 +93,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
         birthday = view.findViewById(R.id.et_birthday);
         imageProfile = view.findViewById(R.id.image_profile);
         spinner = view.findViewById(R.id.et_gender);
+        progressBar = view.findViewById(R.id.progressBar2);
 
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource (getActivity(),
@@ -166,22 +152,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
         super.onDetach();
     }
 
-    private void dispatchTakePictureIntent() {
-        Fragment yourFragment = this;
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        photoFile = null;
-        try {
-            photoFile = createImageFile();
-        } catch (IOException ex) {
-            // Error occurred while creating the File
-        }
-        // Continue only if the File was successfully created
-        if (photoFile !=    null) {
-            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
-        }
-        yourFragment.startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
-    }
-
     @Override
     public void onClick(View v) {
         switch (v.getId()){
@@ -190,7 +160,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
                 break;
 
             case R.id.save_profile:
-
+                progressBar.setVisibility(View.VISIBLE);
+                saveProfile.setEnabled(false);
                 String birthdayString = null;
                 // formatear la fecha
                 try {
@@ -212,11 +183,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
                 user.setName(name.getText().toString());
                 user.setMail(mail.getText().toString());
                 user.setAddress(address.getText().toString());
-                user.setBirthday(birthday.getText().toString());
+                user.setBirthday(birthdayString);
                 user.setGender(spinner.getSelectedItem().toString());
+
                 Bitmap bm = ((BitmapDrawable)imageProfile.getDrawable()).getBitmap();
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                bm.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+                bm.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
                 byte[] encodedString = byteArrayOutputStream.toByteArray();
                 String toBase64 = Base64.encodeToString(encodedString, Base64.DEFAULT);
                 user.setImage(toBase64);
@@ -231,12 +203,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
                         new Response.Listener<String>() {
                             @Override
                             public void onResponse(String response) {
-                                Log.d("Quehay", response);
+                                Log.d("response", response);
                                 try {
                                     JSONObject jsonResponse = new JSONObject(response);
-
                                     if (jsonResponse.getString("data").equals("Ok")){
-                                        showToastMessage("Guardado");
+                                        showToastMessage("Guardado!");
+                                        progressBar.setVisibility(View.GONE);
                                     }else{
                                         showToastMessage("Error!");
                                     }
@@ -279,60 +251,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
         }
 
     }
-
-
-    private void setPic() {
-        // Get the dimensions of the View
-        int targetW = imageProfile.getWidth();
-        int targetH = imageProfile.getHeight();
-
-        // Get the dimensions of the bitmap
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        bmOptions.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-        int photoW = bmOptions.outWidth;
-        int photoH = bmOptions.outHeight;
-
-        // Determine how much to scale down the image
-        int scaleFactor = Math.min(photoW/targetW, photoH/targetH);
-
-        // Decode the image file into a Bitmap sized to fill the View
-        bmOptions.inJustDecodeBounds = false;
-        bmOptions.inSampleSize = scaleFactor;
-        bmOptions.inPurgeable = true;
-        Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-        imageProfile.setImageBitmap(bitmap);
-    }
-
-    private String getImage() {
-        // Get the dimensions of the View
-        int targetW = imageProfile.getWidth();
-        int targetH = imageProfile.getHeight();
-
-        // Get the dimensions of the bitmap
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        bmOptions.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-        int photoW = bmOptions.outWidth;
-        int photoH = bmOptions.outHeight;
-
-        // Determine how much to scale down the image
-        int scaleFactor = Math.min(photoW/targetW, photoH/targetH);
-
-        // Decode the image file into a Bitmap sized to fill the View
-        bmOptions.inJustDecodeBounds = false;
-        bmOptions.inSampleSize = scaleFactor;
-        bmOptions.inPurgeable = true;
-
-        Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-        ByteArrayOutputStream blob = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 0 /* Ignored for PNGs */, blob);
-        String image = blob.toString();
-
-
-        return image;
-    }
-
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -385,23 +303,36 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
         return image;
     }
 
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        photoFile = null;
+        try {
+            photoFile = createImageFile();
+        } catch (IOException ex) {
+            // Error occurred while creating the File
+        }
+        // Continue only if the File was successfully created
+        if (photoFile !=    null) {
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
+        }
+        startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+    }
+
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case 1:
                 if (resultCode == Activity.RESULT_OK) {
-                    //Do something with your captured image. EX:-
-                    Uri selectedImage = data.getData();
-                    String[] filePathColumn = { MediaStore.Images.Media.DATA };
-                    Cursor cursor = getActivity().getContentResolver().query(selectedImage,
-                            filePathColumn, null, null, null);
-                    cursor.moveToFirst();
-                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                    String picturePath = cursor.getString(columnIndex);
-                    cursor.close();
-                    imageProfile.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+                    Picasso.get().load(photoFile).resize(400, 0).centerInside().into(imageProfile);
                 }
         }
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        MenuItem item1 = menu.findItem(R.id.action_search);
+        MenuItem item2 = menu.findItem(R.id.action_grid);
+        item1.setVisible(false);
+        item2.setVisible(false);
     }
 
 }

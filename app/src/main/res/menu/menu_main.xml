@@ -2,7 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/miProfile"
+        android:id="@+id/action_search"
         android:icon="@android:drawable/ic_search_category_default"
         app:showAsAction="ifRoom|withText"
         android:title="Search"
