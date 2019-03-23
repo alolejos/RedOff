@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">RedOff</string>
+    <string name="app_name">CarMovies</string>
     <string name="loginTitle">Ingrese sus datos</string>
     <string name="loginButton">Ingresar</string>
     <string name="loginRegistrer">Registrarse</string>

@@ -6,27 +6,23 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
-import android.widget.Switch;
 import android.widget.TextView;
 
-import com.abcontenidos.www.redhost.Objets.Category;
+import com.abcontenidos.www.redhost.Objets.Post;
 import com.abcontenidos.www.redhost.R;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-public class MyRecyclerViewAdapterCategories extends RecyclerView.Adapter<MyRecyclerViewAdapterCategories.ViewHolder> {
+public class ListAdapterInstagram extends RecyclerView.Adapter<ListAdapterInstagram.ViewHolder> {
 
-    private ArrayList<Category> mData;
+    private ArrayList<Post> mData;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
-    private Context context;
 
     // data is passed into the constructor
-    public MyRecyclerViewAdapterCategories(Context context, ArrayList<Category> data) {
-        this.context = context;
+    public ListAdapterInstagram(Context context, ArrayList<Post> data) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
     }
@@ -35,19 +31,19 @@ public class MyRecyclerViewAdapterCategories extends RecyclerView.Adapter<MyRecy
     @Override
     @NonNull
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = mInflater.inflate(R.layout.recycler_view_category, parent, false);
+        View view = mInflater.inflate(R.layout.recycler_grid_item, parent, false);
         return new ViewHolder(view);
     }
 
     // binds the data to the TextView in each cell
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        String image = "http://redoff.bithive.cloud/files/posts/"+mData.get(position).getImage();
         holder.textName.setText(mData.get(position).getName());
         holder.textDetails.setText(mData.get(position).getDetails());
-        holder.switchSelected.setChecked(Boolean.parseBoolean(mData.get(position).getSelected()));
-        Picasso.get().load(mData.get(position).getImage()).resize(120, 120).into(holder.imageCategory);
+        holder.textCommerce.setText(mData.get(position).getCommerce());
+        Picasso.get().load(image).resize(400, 400).into(holder.imagePromo);
     }
-
 
     // total number of cells
     @Override
@@ -57,18 +53,16 @@ public class MyRecyclerViewAdapterCategories extends RecyclerView.Adapter<MyRecy
 
 
     // stores and recycles views as they are scrolled off screen
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
-        TextView textName, textDetails;
-        ImageView imageCategory;
-        Switch switchSelected;
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        TextView textName, textDetails, textCommerce;
+        ImageView imagePromo;
 
         ViewHolder(View itemView) {
             super(itemView);
-            textName = itemView.findViewById(R.id.textName1);
-            textDetails = itemView.findViewById(R.id.textCategoryDetails);
-            imageCategory = itemView.findViewById(R.id.imageCategory);
-            switchSelected = itemView.findViewById(R.id.switchCategory);
-            switchSelected.setOnCheckedChangeListener(this);
+            textName= itemView.findViewById(R.id.textNameGrid);
+            textDetails = itemView.findViewById(R.id.textDetailsGrid);
+            textCommerce = itemView.findViewById(R.id.textCommerceGrid);
+            imagePromo = itemView.findViewById(R.id.imagePromoGrid);
             itemView.setOnClickListener(this);
         }
 
@@ -76,16 +70,10 @@ public class MyRecyclerViewAdapterCategories extends RecyclerView.Adapter<MyRecy
         public void onClick(View view) {
             if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
         }
-
-        @Override
-        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            mData.get(getAdapterPosition()).setSelected(Boolean.toString(isChecked));
-
-        }
     }
 
     // convenience method for getting data at click position
-    Category getItem(int id) {
+    Post getItem(int id) {
         return mData.get(id);
     }
 
@@ -98,5 +86,4 @@ public class MyRecyclerViewAdapterCategories extends RecyclerView.Adapter<MyRecy
     public interface ItemClickListener {
         void onItemClick(View view, int position);
     }
-
 }

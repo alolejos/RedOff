@@ -322,7 +322,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
         switch (requestCode) {
             case 1:
                 if (resultCode == Activity.RESULT_OK) {
-                    Picasso.get().load(photoFile).resize(400, 0).centerInside().into(imageProfile);
+                    Picasso.get().load(photoFile).resize(400, 400).centerCrop().into(imageProfile);
                 }
         }
     }

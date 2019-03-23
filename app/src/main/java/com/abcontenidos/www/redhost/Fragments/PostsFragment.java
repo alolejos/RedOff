@@ -12,9 +12,11 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.abcontenidos.www.redhost.Dbases.MyDbHelper;
+import com.abcontenidos.www.redhost.Recyclers.ListAdapterInstagram;
 import com.abcontenidos.www.redhost.Recyclers.MyRecyclerViewAdapter;
 import com.abcontenidos.www.redhost.Objets.Post;
 import com.abcontenidos.www.redhost.Dbases.PostDao;
@@ -25,9 +27,10 @@ import com.abcontenidos.www.redhost.Dbases.UserDao;
 
 import java.util.ArrayList;
 
-public class PostsFragment extends Fragment implements MyRecyclerViewAdapter.ItemClickListener {
+public class PostsFragment extends Fragment implements MyRecyclerViewAdapter.ItemClickListener, ListAdapterInstagram.ItemClickListener {
 
     MyRecyclerViewAdapter adapter;
+    ListAdapterInstagram adapter1;
     Intent i;
     User user;
     UserDao userDao;
@@ -36,6 +39,7 @@ public class PostsFragment extends Fragment implements MyRecyclerViewAdapter.Ite
     RecyclerView recyclerView;
     TextView texto;
     Boolean llave = true;
+    SearchView busqueda;
 
     public PostsFragment() {
         // Required empty public constructor
@@ -83,7 +87,9 @@ public class PostsFragment extends Fragment implements MyRecyclerViewAdapter.Ite
         int numberColumnsGrid = 3;
         recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), numberColumnsGrid));
         adapter = new MyRecyclerViewAdapter(getActivity(), list);
+        adapter1 = new ListAdapterInstagram(getActivity(), list);
         adapter.setClickListener(this);
+        adapter1.setClickListener(this);
         recyclerView.setAdapter(adapter);
         return view;
     }
@@ -108,13 +114,20 @@ public class PostsFragment extends Fragment implements MyRecyclerViewAdapter.Ite
         switch (item.getItemId()) {
             case R.id.action_grid:
                 if(llave){
+                    item.setIcon(R.mipmap.grid_icon);
                     llave = false;
-                    recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
-                }else{
-                    llave = true;
                     recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                    recyclerView.setAdapter(adapter1);
+                }else{
+                    item.setIcon(R.mipmap.item_icon);
+                    llave = true;
+                    recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
+                    recyclerView.setAdapter(adapter);
                 }
                 Log.d("grideando", "grid");
+                return true;
+            case R.id.action_search:
+                Log.d("buscando", "grid");
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

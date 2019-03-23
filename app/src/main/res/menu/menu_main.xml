@@ -10,7 +10,7 @@
     </item>
     <item
         android:id="@+id/action_grid"
-        android:icon="@android:drawable/btn_star_big_on"
+        android:icon="@mipmap/item_icon"
         app:showAsAction="ifRoom|withText"
         android:title="Términos y condiciones">
 
