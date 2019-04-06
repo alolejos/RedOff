@@ -217,6 +217,10 @@ public class CategoriesFragment extends Fragment implements View.OnClickListener
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
+        if(user.getCommerce_name().equals("null")){
+            MenuItem comercio = menu.findItem(R.id.action_comercio);
+            comercio.setVisible(false);
+        }
         MenuItem item1 = menu.findItem(R.id.action_search);
         item1.setVisible(false);
         MenuItem item2 = menu.findItem(R.id.action_grid);

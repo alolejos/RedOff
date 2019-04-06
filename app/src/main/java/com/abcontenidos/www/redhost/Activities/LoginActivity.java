@@ -97,6 +97,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                         SQLiteDatabase db = helper.getWritableDatabase();
                                         UserDao userDao = new UserDao(db);
                                         userDao.clear();
+                                        Log.d("viene", response);
                                         try {
                                             JSONObject jsonResponse = new JSONObject(response);
                                             JSONObject data = jsonResponse.getJSONObject("data");
@@ -116,6 +117,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                                 user.setGender(listado.getString("gender"));
                                                 user.setBirthday(listado.getString("birthday"));
                                                 user.setImage(listado.getString("image"));
+                                                user.setCommerce_id(listado.getString("commerce_id"));
+                                                user.setCommerce_name(listado.getString("commerce_name"));
+                                                user.setCommerce_address(listado.getString("commerce_address"));
+                                                user.setCommerce_phone(listado.getString("commerce_phone"));
+                                                user.setCommerce_email(listado.getString("commerce_email"));
+                                                user.setCommerce_web(listado.getString("commerce_web"));
+                                                user.setCommerce_image(listado.getString("commerce_image"));
+
                                                 userDao.save(user);
                                                 JSONArray posteos = data.getJSONArray("posts");
                                                 save_posteos(posteos);

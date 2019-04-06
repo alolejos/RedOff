@@ -7,14 +7,18 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
 import android.widget.TextView;
 
+import com.abcontenidos.www.redhost.Activities.CommerceActivity;
+import com.abcontenidos.www.redhost.Activities.ForgotActivity;
 import com.abcontenidos.www.redhost.Dbases.MyDbHelper;
 import com.abcontenidos.www.redhost.Recyclers.ListAdapterInstagram;
 import com.abcontenidos.www.redhost.Recyclers.MyRecyclerViewAdapter;
@@ -32,7 +36,7 @@ public class PostsFragment extends Fragment implements MyRecyclerViewAdapter.Ite
     MyRecyclerViewAdapter adapter;
     ListAdapterInstagram adapter1;
     Intent i;
-    User user;
+    public User user;
     UserDao userDao;
     PostDao postDao;
     ArrayList<Post> list;
@@ -112,6 +116,10 @@ public class PostsFragment extends Fragment implements MyRecyclerViewAdapter.Ite
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
+            case R.id.action_comercio:
+                Intent intent = new Intent(getContext(), CommerceActivity.class);
+                startActivity(intent);
+                return true;
             case R.id.action_grid:
                 if(llave){
                     item.setIcon(R.mipmap.grid_icon);
@@ -124,14 +132,25 @@ public class PostsFragment extends Fragment implements MyRecyclerViewAdapter.Ite
                     recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
                     recyclerView.setAdapter(adapter);
                 }
-                Log.d("grideando", "grid");
                 return true;
             case R.id.action_search:
-                Log.d("buscando", "grid");
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+            if(user.getCommerce_name().equals("null")){
+                MenuItem comercio = menu.findItem(R.id.action_comercio);
+                comercio.setVisible(false);
+            }
+
+
+
+        //MenuItem item2 = menu.findItem(R.id.action_grid);
+        //item2.setVisible(false);
     }
 
 }

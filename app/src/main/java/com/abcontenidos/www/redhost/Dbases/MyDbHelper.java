@@ -38,6 +38,13 @@ public class MyDbHelper extends SQLiteOpenHelper {
                 + "gender TEXT NOT NULL,"
                 + "birthday TEXT NOT NULL,"
                 + "image BLOB NOT NULL,"
+                + "commerce_id TEXT,"
+                + "commerce_name TEXT,"
+                + "commerce_address TEXT,"
+                + "commerce_phone TEXT,"
+                + "commerce_email TEXT,"
+                + "commerce_web TEXT,"
+                + "commerce_image TEXT,"
                 + "UNIQUE (id))");
         db.execSQL("CREATE TABLE posts " + " ("
                 + "id INTEGER PRIMARY KEY AUTOINCREMENT,"

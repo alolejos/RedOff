@@ -32,9 +32,9 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.abcontenidos.www.redhost.Dbases.MyDbHelper;
-import com.abcontenidos.www.redhost.R;
-import com.abcontenidos.www.redhost.Objets.User;
 import com.abcontenidos.www.redhost.Dbases.UserDao;
+import com.abcontenidos.www.redhost.Objets.User;
+import com.abcontenidos.www.redhost.R;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -42,7 +42,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
-
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
@@ -57,7 +56,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ProfileFragment extends Fragment implements View.OnClickListener, AdapterView.OnItemSelectedListener{
+public class CommerceFragment extends Fragment implements View.OnClickListener, AdapterView.OnItemSelectedListener{
 
     EditText name, mail, address, birthday;
     Spinner spinner;
@@ -69,7 +68,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
     User user;
     ProgressBar progressBar;
 
-    public ProfileFragment() {
+    public CommerceFragment() {
         // Required empty public constructor
     }
 
@@ -84,7 +83,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_profile, container, false);
+        View view = inflater.inflate(R.layout.fragment_commerce, container, false);
 
         saveProfile = view.findViewById(R.id.save_profile);
         name = view.findViewById(R.id.et_profile_name);

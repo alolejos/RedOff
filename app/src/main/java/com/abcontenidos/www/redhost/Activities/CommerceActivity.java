@@ -10,7 +10,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,19 +19,20 @@ import android.widget.Toast;
 import com.abcontenidos.www.redhost.Dbases.MyDbHelper;
 import com.abcontenidos.www.redhost.Dbases.UserDao;
 import com.abcontenidos.www.redhost.Fragments.CategoriesFragment;
+import com.abcontenidos.www.redhost.Fragments.CommerceFragment;
 import com.abcontenidos.www.redhost.Fragments.PostsFragment;
 import com.abcontenidos.www.redhost.Fragments.ProfileFragment;
 import com.abcontenidos.www.redhost.R;
 
-public class PrincipalActivity extends AppCompatActivity  {
+public class CommerceActivity extends AppCompatActivity {
 
     Toolbar myToolbar;
-    PostsFragment postsFragment = new PostsFragment();
+    CommerceFragment commerceFragment = new CommerceFragment();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_principal);
+        setContentView(R.layout.activity_commerce);
 
         myToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(myToolbar);
@@ -44,7 +44,7 @@ public class PrincipalActivity extends AppCompatActivity  {
 
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-        fragmentTransaction.add(R.id.fragment_container, postsFragment);
+        fragmentTransaction.add(R.id.fragment_container, commerceFragment);
 
         fragmentTransaction.commit();
 
@@ -54,16 +54,21 @@ public class PrincipalActivity extends AppCompatActivity  {
                     new PostsFragment()).commit();
         }
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_main, menu);
+        inflater.inflate(R.menu.menu_main_commerce, menu);
         return true;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_user:
+                finish();
+                break;
             case R.id.action_terminos:
                 Intent i = new Intent(this, TermsActivity.class);
                 startActivity(i);
@@ -85,11 +90,13 @@ public class PrincipalActivity extends AppCompatActivity  {
 
         return true;
     }
-    private void showToastMessage (String message) {
+
+    private void showToastMessage(String message) {
         Toast toast = Toast.makeText(this, message, Toast.LENGTH_LONG);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
     }
+
     private BottomNavigationView.OnNavigationItemSelectedListener navListener =
             new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override
@@ -116,12 +123,12 @@ public class PrincipalActivity extends AppCompatActivity  {
             };
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        super.onActivityResult(requestCode,resultCode,data);
+        super.onActivityResult(requestCode, resultCode, data);
 
     }
-
-
 }
+
+
+

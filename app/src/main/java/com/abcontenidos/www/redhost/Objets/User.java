@@ -3,7 +3,7 @@ package com.abcontenidos.www.redhost.Objets;
 
 public class User {
     String id;
-    public String name;
+    String name;
     String mail;
     String token;
     String address;
@@ -11,6 +11,13 @@ public class User {
     String birthday;
     String image;
     String pass;
+    String commerce_id;
+    String commerce_name;
+    String commerce_address;
+    String commerce_phone;
+    String commerce_email;
+    String commerce_web;
+    String commerce_image;
 
     public String getPass() {
         return pass;
@@ -83,6 +90,62 @@ public class User {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public String getCommerce_id() {
+        return commerce_id;
+    }
+
+    public void setCommerce_id(String commerce_id) {
+        this.commerce_id = commerce_id;
+    }
+
+    public String getCommerce_name() {
+        return commerce_name;
+    }
+
+    public void setCommerce_name(String commerce_name) {
+        this.commerce_name = commerce_name;
+    }
+
+    public String getCommerce_address() {
+        return commerce_address;
+    }
+
+    public void setCommerce_address(String commerce_address) {
+        this.commerce_address = commerce_address;
+    }
+
+    public String getCommerce_phone() {
+        return commerce_phone;
+    }
+
+    public void setCommerce_phone(String commerce_phone) {
+        this.commerce_phone = commerce_phone;
+    }
+
+    public String getCommerce_email() {
+        return commerce_email;
+    }
+
+    public void setCommerce_email(String commerce_email) {
+        this.commerce_email = commerce_email;
+    }
+
+    public String getCommerce_web() {
+        return commerce_web;
+    }
+
+    public void setCommerce_web(String commerce_web) {
+        this.commerce_web = commerce_web;
+    }
+
+    public String getCommerce_image() {
+        return commerce_image;
+    }
+
+    public void setCommerce_image(String commerce_image) {
+        this.commerce_image = commerce_image;
     }
 
     public User(){

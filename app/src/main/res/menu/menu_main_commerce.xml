@@ -1,24 +1,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item
-        android:id="@+id/action_search"
-        android:icon="@android:drawable/ic_search_category_default"
-        app:showAsAction="ifRoom|withText"
-        android:title="Search"
-        app:actionViewClass="android.widget.SearchView">
-    </item>
-    <item
-        android:id="@+id/action_grid"
-        android:icon="@mipmap/item_icon"
-        app:showAsAction="ifRoom|withText"
-        android:title="Cambio modo">
 
-    </item>
+
     <item
-        android:id="@+id/action_comercio"
+        android:id="@+id/action_user"
         android:icon="@android:drawable/btn_star"
-        android:title="Comercio">
+        android:title="Usuario">
 
     </item>
     <item
