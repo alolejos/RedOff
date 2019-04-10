@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
@@ -60,13 +61,13 @@ public class CommerceFragment extends Fragment implements View.OnClickListener, 
 
     EditText name, mail, address, birthday;
     Spinner spinner;
-    ImageView imageProfile;
     Button saveProfile;
     static final int REQUEST_TAKE_PHOTO = 1;
     String mCurrentPhotoPath;
     File photoFile;
     User user;
     ProgressBar progressBar;
+    RecyclerView imageProfile;
 
     public CommerceFragment() {
         // Required empty public constructor
@@ -129,7 +130,7 @@ public class CommerceFragment extends Fragment implements View.OnClickListener, 
         // Pase de datos a los objetos visuales
         byte[] decodedString = Base64.decode(user.getImage(), Base64.DEFAULT);
         Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-        imageProfile.setImageBitmap(decodedByte);
+
         name.setText(user.getName());
         mail.setText(user.getMail());
         address.setText(user.getAddress());
@@ -185,12 +186,7 @@ public class CommerceFragment extends Fragment implements View.OnClickListener, 
                 user.setBirthday(birthdayString);
                 user.setGender(spinner.getSelectedItem().toString());
 
-                Bitmap bm = ((BitmapDrawable)imageProfile.getDrawable()).getBitmap();
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                bm.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
-                byte[] encodedString = byteArrayOutputStream.toByteArray();
-                String toBase64 = Base64.encodeToString(encodedString, Base64.DEFAULT);
-                user.setImage(toBase64);
+
                 // Guardado en base de datos
                 userDao.update(user);
 
